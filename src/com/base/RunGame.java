@@ -21,7 +21,9 @@ public class RunGame
 	public static JFrame frame;
 	public static Display display;
 	private String dev = "Infdev";
-	private double versionNum = 0.01;
+	private double versionNum = 0.03;
+	public static final int WIDTH = 800;
+	public static final int HEIGHT = 600;
 	
 	public RunGame()
 	{
@@ -46,7 +48,7 @@ public class RunGame
 			display = new Display();
 			frame = new JFrame("Excelcior Version "+dev+" "+versionNum);
 			frame.add(display);
-			frame.setSize(800, 600);
+			frame.setSize(WIDTH, HEIGHT);
 			frame.getContentPane().setCursor(blank);
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setResizable(false);

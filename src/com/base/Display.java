@@ -25,6 +25,8 @@ import com.input.InputHandler;
 public class Display extends Canvas implements Runnable
 {
 	private static final long serialVersionUID = 1L;
+	
+	
 	private InputHandler input;
 	public static Thread mainThread;
 	private boolean isRunning = true;
@@ -35,20 +37,27 @@ public class Display extends Canvas implements Runnable
 	//Sets up variables
 	public Display() 
 	{
+		//Handles key events 
 		input = new InputHandler();
 		addKeyListener(input);
+		
+		//Starts new Game object for handling events
 		game = new Game();
 	}
 	
 	//Repaints the screen
 	public void paint(Graphics g)
 	{
+		//Redraws screen
 	    screen = createImage(getWidth(),getHeight());
 	    graph = screen.getGraphics();
 		
-		graph.setColor(new Color(255, 0, 0));
+	    //Sets players color
+		graph.setColor(new Color(25, 25, 0));
 		
-		graph.fillRect((int)game.player.x, (int)game.player.y, game.player.girth, game.player.height);
+		//Draws player
+		graph.fillRect((int)game.player.x, (int)game.player.topOfPlayer, game.player.girth,
+				(int)game.player.y - (int)game.player.topOfPlayer);
 	
 	    // At the end of the method, draw the backBuffer to the 
 	    // screen.

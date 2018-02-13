@@ -18,6 +18,7 @@ import com.entities.Player;
 public class Game
 {
 	private int tickCount = 0;
+	public static final double GRAVITY = 0.000005;
 	public Player player;
 	
 	//Set up initial variables
@@ -34,32 +35,69 @@ public class Game
 	{
 		tickCount++;
 		
-		//Key events
+		/* KEY EVENTS ****/
+		
+		//If quitting
 		if(key[KeyEvent.VK_ESCAPE])
 		{
 			RunGame.frame.dispose();
 			return false;
 		}
 		
-		if(key[KeyEvent.VK_UP])
+		//If running
+		if(key[KeyEvent.VK_SHIFT])
 		{
-			player.y -= player.speed;
+			player.running = true;
+		}
+		else
+		{
+			player.running = false;
 		}
 		
+		//If jumping and player is on the ground
+		if(key[KeyEvent.VK_UP] && player.y == player.floor)
+		{
+			player.jumping = true;
+			player.upSpeed = Player.DEFAULT_JUMP_SPEED;
+		}
+		
+		//If crouching
 		if(key[KeyEvent.VK_DOWN])
 		{
-			player.y += player.speed;
+			player.crouching = true;
 		}
-		
-		if(key[KeyEvent.VK_RIGHT])
+		else
 		{
-			player.x += player.speed;
+			player.crouching = false;
 		}
 		
+		player.updateValues();
+		
+		double xa = 0;
+		
+		//If moving right
+		if(key[KeyEvent.VK_RIGHT])
+		{		
+			xa = player.speed;
+		}
+		
+		//If moving left
 		if(key[KeyEvent.VK_LEFT])
 		{
-			player.x -= player.speed;
+			xa = -player.speed;
 		}
+		
+	   /*
+	    * If player is in the air, any movement from side to side
+	    * is going to be much slower as it is hard to change direction
+	    * while in air
+	    */
+		if(player.inAir)
+		{
+			xa /= 3;
+		}
+
+		player.move(xa);
 		
 		return true;
 	}
