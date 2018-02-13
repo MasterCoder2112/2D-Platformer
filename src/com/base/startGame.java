@@ -9,14 +9,10 @@ package com.base;
  * Starts the game. Nothing much else to say.
  *
  */
-public class startGame {
-
-	public startGame() {
-		// TODO Auto-generated constructor stub
+public class startGame 
+{
+	public static void main(String[] args) 
+	{
+		new RunGame();
 	}
-
-	public static void main(String[] args) {
-		System.out.println("Hello World");
-	}
-
 }
