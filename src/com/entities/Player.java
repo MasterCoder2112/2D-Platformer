@@ -40,6 +40,7 @@ public class Player
 	public double upSpeed;
 	public double fallingSpeed;
 	public double horizontalMovement;
+	public double maxAirHSpeed; //Max speed you can be in the air
 	
 	//public Inventory inventory = null;
 	
@@ -196,8 +197,19 @@ public class Player
 			
 			//If in the air, crouching speeds you up, otherwise
 			//it slows you down
-			if(y < floor)
+			if(inAir)
 			{
+			   /*
+			    * Only do once per jump, but if in the air and you
+			    * crouch, your speed will be increased once and
+			    * only once so it doesn't keep compounding on itself.
+			    */
+				if(maxAirHSpeed == 0)
+				{
+					maxAirHSpeed = horizontalMovement * 1.25;
+					horizontalMovement = maxAirHSpeed;
+				}
+				
 				speed = speed * 1.25;
 			}
 			else
@@ -207,6 +219,7 @@ public class Player
 		}
 		else
 		{
+			maxAirHSpeed = 0;
 			//Slowly rise up to default height if not crouching
 			if(height < DEFAULT_HEIGHT)
 			{
@@ -246,7 +259,7 @@ public class Player
 		//them out of jumping if they are
 		if(!checkUpper())
 		{
-			y = 0;
+			y = height;
 			jumping = false;
 			upSpeed = 0;
 		}
@@ -274,7 +287,7 @@ public class Player
 	public boolean checkUpper()
 	{
 		//As long as not going out of the top of the screen
-		if(y <= 0)
+		if(y - height <= 0)
 		{
 			return false;
 		}
