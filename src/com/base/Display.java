@@ -7,9 +7,11 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 
+import javax.swing.JApplet;
 import javax.swing.JPanel;
 
 import com.entities.Player;
+import com.base.RunGame;
 import com.input.InputHandler;
 
 /**
@@ -22,7 +24,7 @@ import com.input.InputHandler;
  * May do more in the future but we will get there later.
  *
  */
-public class Display extends Canvas implements Runnable
+public class Display extends JApplet implements Runnable
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -48,6 +50,7 @@ public class Display extends Canvas implements Runnable
 	//Repaints the screen
 	public void paint(Graphics g)
 	{
+		this.setSize(RunGame.WIDTH,RunGame.HEIGHT);
 		//Redraws screen
 	    screen = createImage(getWidth(),getHeight());
 	    graph = screen.getGraphics();
