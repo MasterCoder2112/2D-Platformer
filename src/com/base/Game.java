@@ -2,8 +2,10 @@ package com.base;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 
 import com.entities.Player;
+import com.structures.Platform;
 
 /**
  * @title Game
@@ -21,10 +23,14 @@ public class Game
 	public static final double GRAVITY = 0.000005;
 	public Player player;
 	
+	public static ArrayList<Platform> platforms = new ArrayList<Platform>();
+	
 	//Set up initial variables
 	public Game() 
 	{
 		player = new Player();
+		new Platform(100, 500, 200, 15);
+		new Platform(300, 400, 150, 25, 100, 0, 0.01, 0, true, false);
 	}
 	
    /**
@@ -69,6 +75,12 @@ public class Game
 		else
 		{
 			player.crouching = false;
+		}
+		
+		//Update all the platforms
+		for(Platform pf: platforms)
+		{
+			pf.updatePlatform();
 		}
 		
 		player.updateValues();

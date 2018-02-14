@@ -2,6 +2,7 @@ package com.entities;
 
 import com.base.Game;
 import com.base.RunGame;
+import com.structures.Platform;
 
 /**
  * @title Player
@@ -81,7 +82,7 @@ public class Player
 		armor = 100;
 		ammo = 0;
 		shield = 0;
-		x = 100;
+		x = 500;
 		y = RunGame.HEIGHT - 30;
 		//public Weapon[] weapons = null;
 		weight = 0;
@@ -127,14 +128,22 @@ public class Player
 	    */
 		if(inAir)
 		{
-			x += xa;
+			//If player can move in this direction
+			if(checkCollisionX(xa))
+			{		
+				x += xa;
+			}
 		}
 		else
 		{
 			horizontalMovement = xa;
 		}
 		
-		x += horizontalMovement;
+		//If can move in this direction
+		if(checkCollisionX(horizontalMovement))
+		{
+			x += horizontalMovement;
+		}
 		
 		//If player reaches left edge of screen, loop him/her around
 		if(x + girth < 0)
@@ -234,6 +243,7 @@ public class Player
 		}
 		
 		//TODO change floor stuff in future
+		
 		floor = RunGame.HEIGHT - 30;
 
 		//If in the air
@@ -305,6 +315,32 @@ public class Player
 		if(y + 30 >= RunGame.HEIGHT)
 		{
 			return false;
+		}
+		
+		return true;
+	}
+	
+   /**
+    * Check to make sure the player can move horizontally and not
+    * hit a block.
+    * @param xa
+    * @return
+    */
+	public boolean checkCollisionX(double xa)
+	{
+		for(Platform pf: Game.platforms)
+		{
+			/*if(((x + xa > pf.x && x + xa < pf.x + pf.width)||
+					(x + girth + xa > pf.x && x + girth + xa < pf.x)) 
+					&& ((y > pf.y && y < pf.y - pf.height) ||
+							(topOfPlayer > pf.y && topOfPlayer < pf.y - pf.height)))
+			{
+				return false;
+			}*/
+			if(x + xa > pf.x && x + xa < pf.x + pf.width)
+			{
+				return false;
+			}
 		}
 		
 		return true;

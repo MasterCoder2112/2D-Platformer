@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 
 import com.entities.Player;
 import com.input.InputHandler;
+import com.structures.Platform;
 
 /**
  * @title Display
@@ -53,11 +54,18 @@ public class Display extends Canvas implements Runnable
 	    graph = screen.getGraphics();
 		
 	    //Sets players color
-		graph.setColor(new Color(25, 25, 0));
+		graph.setColor(new Color(0, 0, 100));
 		
 		//Draws player
 		graph.fillRect((int)game.player.x, (int)game.player.topOfPlayer, game.player.girth,
 				(int)game.player.y - (int)game.player.topOfPlayer);
+		
+		//Draw all the platforms
+		for(int i = 0; i < Game.platforms.size(); i++)
+		{
+			Platform pf = Game.platforms.get(i);
+			graph.fillRect((int)pf.x, (int)pf.y, pf.width, pf.height);
+		}
 	
 	    // At the end of the method, draw the backBuffer to the 
 	    // screen.
