@@ -172,6 +172,8 @@ public class Player
 		{
 			x = -girth + 10;
 		}
+		
+		updateValues();
 	}
 	
    /**
@@ -303,11 +305,14 @@ public class Player
 		
 		//If on the ground, there is no longer a falling speed for the player
 		//because the player is no longer falling
-		if(y == floor)
+		if(y >= floor)
 		{
 			jumping = false;
 			fallingSpeed = 0;
 			inAir = false;
+			y = floor;
+			extraMovementY = 0;
+			extraMovementX = 0;
 		}
 		
 		//If on the ground, then update horizontal movement to be 0
@@ -318,8 +323,8 @@ public class Player
 	}
 	
    /**
-    * Check to make sure the player can move horizontally and not
-    * hit a block.
+    * Check to make sure the player can move in any direction and not
+    * 
     * @param xa
     * @return
     */
@@ -361,8 +366,17 @@ public class Player
 				extraMovementX = pf.xSpeed;
 				extraMovementY = pf.ySpeed;
 				
+				//If block moves up and down, make sure to keep
+				//setting the players position to the top of the
+				//block
+				if(y - height < pf.y && pf.ySpeed != 0
+						&& y < pf.y + pf.height)
+				{
+					y = pf.y;
+				}
+				
 				//Update where the floor is based on the players position each tick as well.
-				if(y <= pf.y + pf.height && floor > pf.y + pf.height)
+				if(y <= pf.y && floor > pf.y + pf.height)
 				{
 				   /*
 				    * If the player is directly over or on this platform, set this platform
@@ -392,7 +406,7 @@ public class Player
 			else
 			{
 				//Update where the floor is based on the players position each tick as well.
-				if(y <= pf.y + pf.height && floor > pf.y + pf.height && 
+				if(y <= pf.y && floor > pf.y + pf.height && 
 						(newX <= pf.x + pf.width && newX + girth > pf.x + 1))
 				{
 				   /*

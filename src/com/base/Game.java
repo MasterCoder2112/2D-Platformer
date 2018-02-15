@@ -67,8 +67,6 @@ public class Game
 			pf.updatePlatform();
 		}
 		
-		player.updateValues();
-		
 		//If jumping and player is on the ground
 		if(key[KeyEvent.VK_UP] && player.y == player.floor)
 		{
