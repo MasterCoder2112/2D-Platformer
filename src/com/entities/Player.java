@@ -19,6 +19,8 @@ public class Player
 	public static final double DEFAULT_JUMP_SPEED = 0.04;
 	public static final int DEFAULT_HEIGHT = 70;
 	
+	public Platform platformOn;
+	
 	//Things that the player may or may not have in the future
 	public int health;
 	public int armor;
@@ -41,6 +43,8 @@ public class Player
 	public double upSpeed;
 	public double fallingSpeed;
 	public double horizontalMovement;
+	public double extraMovementX;
+	public double extraMovementY;
 	public double maxAirHSpeed; //Max speed you can be in the air
 	
 	//public Inventory inventory = null;
@@ -129,7 +133,7 @@ public class Player
 		if(inAir)
 		{
 			//If player can move in this direction
-			if(checkCollisionX(xa))
+			if(checkCollision(xa, 0))
 			{		
 				x += xa;
 			}
@@ -138,10 +142,22 @@ public class Player
 		{
 			horizontalMovement = xa;
 		}
+		//TODO move crap
+		//If can move in this direction and player is not jumping
+		if(checkCollision(extraMovementX, 0) && !jumping)
+		{		
+			x += extraMovementX;
+		}
 		
 		//If can move in this direction
-		if(checkCollisionX(horizontalMovement))
-		{
+		if(checkCollision(extraMovementY, 0))
+		{		
+			y += extraMovementY;
+		}
+		
+		//If can move in this direction
+		if(checkCollision(horizontalMovement, 0))
+		{		
 			x += horizontalMovement;
 		}
 		
@@ -165,6 +181,10 @@ public class Player
     */
 	public void updateValues()
 	{
+		//Checks the players position and updates the floor values and such
+		//based on it.
+		checkCollision(0,0);
+		
 		//Updates speed values if player is running
 		if(running)
 		{
@@ -177,10 +197,20 @@ public class Player
 		
 		//If jumping
 		if(jumping)
-		{
+		{		
 			//Move player up but decrease speed each time by gravity
-			y -= upSpeed;
-			upSpeed -= Game.GRAVITY;
+			//But the player has to be able to move upward
+			if(checkCollision(0, -upSpeed))
+			{	
+				y -= upSpeed;
+				upSpeed -= Game.GRAVITY;
+			}
+			else
+			{
+				jumping = false;
+				upSpeed = 0;
+				fallingSpeed = 0;
+			}
 		}
 		
 		double crouchAmount = 0.01;
@@ -234,6 +264,14 @@ public class Player
 			{
 				height += crouchAmount;
 				topOfPlayer -= crouchAmount;
+				
+				//If moving up got the player stuck in a platform, move
+				//the player back down
+				if(!checkCollision(0,0))
+				{
+					height -= crouchAmount;
+					topOfPlayer += crouchAmount;
+				}
 			}
 			else
 			{
@@ -241,10 +279,6 @@ public class Player
 				topOfPlayer = (int)y - DEFAULT_HEIGHT;
 			}
 		}
-		
-		//TODO change floor stuff in future
-		
-		floor = RunGame.HEIGHT - 30;
 
 		//If in the air
 		if(y < floor)
@@ -254,30 +288,24 @@ public class Player
 			//If not jumping (therefore falling)
 			if(!jumping)
 			{
-				y -= fallingSpeed;
-				fallingSpeed -= fallingSpeed - Game.GRAVITY;
+				//Check to see if y can keep falling anyway
+				if(y - fallingSpeed < floor)
+				{
+					y -= fallingSpeed;
+					fallingSpeed = fallingSpeed - Game.GRAVITY;
+				}
+				else
+				{
+					y = floor;
+				}
 			}
-		}
-		
-		//If player is below the floor then quickly reset his/her position
-		if(!checkLower())
-		{
-			y = floor;
-		}
-		
-		//If player is above ceiling quickly reset his/her position and get
-		//them out of jumping if they are
-		if(!checkUpper())
-		{
-			y = height;
-			jumping = false;
-			upSpeed = 0;
 		}
 		
 		//If on the ground, there is no longer a falling speed for the player
 		//because the player is no longer falling
 		if(y == floor)
 		{
+			jumping = false;
 			fallingSpeed = 0;
 			inAir = false;
 		}
@@ -290,60 +318,115 @@ public class Player
 	}
 	
    /**
-    * Makes sure player doesn't go above the screen
-    * @param ya
-    * @return
-    */
-	public boolean checkUpper()
-	{
-		//As long as not going out of the top of the screen
-		if(y - height <= 0)
-		{
-			return false;
-		}
-		
-		return true;
-	}
-	
-   /**
-    * Makes sure Player is not moving out of the bottom of the screen
-    * @return
-    */
-	public boolean checkLower()
-	{
-		//If not moving out of bottom of the screen
-		if(y + 30 >= RunGame.HEIGHT)
-		{
-			return false;
-		}
-		
-		return true;
-	}
-	
-   /**
     * Check to make sure the player can move horizontally and not
     * hit a block.
     * @param xa
     * @return
     */
-	public boolean checkCollisionX(double xa)
+	public boolean checkCollision(double xa, double ya)
 	{
+		//The new X value
+		double newX = (x + xa);
+		
+		//The new Y value
+		double newY = (y + ya);
+		
+		//Set floor back to the bottom of the level each time by default
+		floor = RunGame.HEIGHT - 30;
+		
+		//Reset whether player is on a platform or not
+		platformOn = null;
+		
+		//If player hits the ceiling here
+		if(newY - height < 0)
+		{
+			return false;
+		}
+		
+		//If player hits bottom of the screen
+		if(newY + 30 > RunGame.HEIGHT)
+		{
+			return false;
+		}
+		
+		//TODO Collision
+		//Check all platforms to see if the player is inside of them
 		for(Platform pf: Game.platforms)
 		{
-			/*if(((x + xa > pf.x && x + xa < pf.x + pf.width)||
-					(x + girth + xa > pf.x && x + girth + xa < pf.x)) 
-					&& ((y > pf.y && y < pf.y - pf.height) ||
-							(topOfPlayer > pf.y && topOfPlayer < pf.y - pf.height)))
+			if(((newX <= pf.x + pf.width && newX + girth > pf.x + 1)) 
+					&& ((newY > pf.y && newY - height <= pf.y + pf.height)))
 			{
-				return false;
-			}*/
-			if(x + xa > pf.x && x + xa < pf.x + pf.width)
-			{
+				//The extra movement added to the player when he is on 
+				//a moving platform both horizontally and vertically
+				extraMovementX = pf.xSpeed;
+				extraMovementY = pf.ySpeed;
+				
+				//Update where the floor is based on the players position each tick as well.
+				if(y <= pf.y + pf.height && floor > pf.y + pf.height)
+				{
+				   /*
+				    * If the player is directly over or on this platform, set this platform
+				    * as being the one that the player is "on" so that the player can move
+				    * with it if it is moving. 
+				    */
+					platformOn = pf;
+					
+					floor = pf.y;
+				}
+				else
+				{
+					horizontalMovement = extraMovementX;
+					
+					//If the floor is below or the same as the levels floor value.
+					if(floor >= RunGame.HEIGHT - 30)
+					{
+						floor = RunGame.HEIGHT - 30;
+						platformOn = null;
+						extraMovementX = 0;
+						extraMovementY = 0;
+					}
+				}
+				
 				return false;
 			}
+			else
+			{
+				//Update where the floor is based on the players position each tick as well.
+				if(y <= pf.y + pf.height && floor > pf.y + pf.height && 
+						(newX <= pf.x + pf.width && newX + girth > pf.x + 1))
+				{
+				   /*
+				    * If the player is directly over or on this platform, set this platform
+				    * as being the one that the player is "on" so that the player can move
+				    * with it if it is moving. 
+				    */
+					platformOn = pf;
+					
+					floor = pf.y;
+					
+					//Only if on the top of the block
+					if(Math.abs(floor - y) < 0.05)
+					{
+						//The extra movement added to the player when he is on 
+						//a moving platform both horizontally and vertically
+						extraMovementX = pf.xSpeed;
+						extraMovementY = pf.ySpeed;
+					}
+				}
+			}
+		}
+		
+		//Defaultly, if no other floor height is set, set it to the level floor
+		if(floor >= RunGame.HEIGHT - 30)
+		{
+			floor = RunGame.HEIGHT - 30;
+			
+			//If it gets here, the player is not on a platform
+			platformOn = null;
+			
+			extraMovementX = 0;
 		}
 		
 		return true;
 	}
-
 }

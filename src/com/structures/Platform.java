@@ -21,8 +21,6 @@ public class Platform
 	public int endY;
 	public double xSpeed;
 	public double ySpeed;
-	public int xDirection;
-	public int yDirection;
 	
 	//Position variables
 	public double x;
@@ -103,7 +101,7 @@ public class Platform
 		    * it that direction. Once it reaches the last movement, it sets the 
 		    * position to the destination x and change the direction.
 		    */
-			if(xDirection == 0)
+			if(xSpeed > 0)
 			{
 				if(x + xSpeed < endX)
 				{
@@ -112,24 +110,24 @@ public class Platform
 				else
 				{
 					x = endX;
-					xDirection = 1;
+					xSpeed = -xSpeed;
 				}
 			}
 			else
 			{
-				if(x - xSpeed > startX)
+				if(x + xSpeed > startX)
 				{
-					x -= xSpeed;
+					x += xSpeed;
 				}
 				else
 				{
 					x = startX;
-					xDirection = 0;
+					xSpeed = -xSpeed;
 				}
 			}
 			
 			//Same thing but in the y direction
-			if(yDirection == 0)
+			if(ySpeed > 0)
 			{
 				if(y + ySpeed < endY)
 				{
@@ -138,19 +136,19 @@ public class Platform
 				else
 				{
 					y = endY;
-					yDirection = 1;
+					ySpeed = -ySpeed;
 				}
 			}
 			else
 			{
 				if(y - ySpeed > startY)
 				{
-					y -= ySpeed;
+					y += ySpeed;
 				}
 				else
 				{
 					y = startY;
-					yDirection = 0;
+					ySpeed = -ySpeed;
 				}
 			}
 		}

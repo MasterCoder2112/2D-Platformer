@@ -19,7 +19,7 @@ import com.structures.Platform;
  */
 public class Game
 {
-	private int tickCount = 0;
+	public static int tickCount = 0;
 	public static final double GRAVITY = 0.000005;
 	public Player player;
 	
@@ -30,7 +30,8 @@ public class Game
 	{
 		player = new Player();
 		new Platform(100, 500, 200, 15);
-		new Platform(300, 400, 150, 25, 100, 0, 0.01, 0, true, false);
+		new Platform(300, 400, 300, 25, 100, 0, 0.01, 0, true, false);
+		new Platform(100, 125, 100, 25, 0, 300, 0, 0.01, true, false);
 	}
 	
    /**
@@ -60,6 +61,14 @@ public class Game
 			player.running = false;
 		}
 		
+		//Update all the platforms
+		for(Platform pf: platforms)
+		{
+			pf.updatePlatform();
+		}
+		
+		player.updateValues();
+		
 		//If jumping and player is on the ground
 		if(key[KeyEvent.VK_UP] && player.y == player.floor)
 		{
@@ -76,14 +85,6 @@ public class Game
 		{
 			player.crouching = false;
 		}
-		
-		//Update all the platforms
-		for(Platform pf: platforms)
-		{
-			pf.updatePlatform();
-		}
-		
-		player.updateValues();
 		
 		double xa = 0;
 		
