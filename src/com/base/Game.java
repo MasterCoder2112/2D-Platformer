@@ -32,6 +32,7 @@ public class Game
 		new Platform(100, 500, 200, 15);
 		new Platform(300, 400, 300, 25, 100, 0, 0.01, 0, true, false);
 		new Platform(100, 125, 100, 25, 0, 300, 0, 0.01, true, false);
+		new Platform(300, 200, 100, 25, 200, 100, 0.01, 0.01, true, false);
 	}
 	
    /**

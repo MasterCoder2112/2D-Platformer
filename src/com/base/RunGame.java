@@ -21,7 +21,7 @@ public class RunGame
 	public static JFrame frame;
 	public static Display display;
 	private String dev = "Infdev";
-	private double versionNum = 0.03;
+	private double versionNum = 0.1;
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 600;
 	
