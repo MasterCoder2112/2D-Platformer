@@ -5,6 +5,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import com.entities.Player;
+import com.entities.Projectile;
 import com.structures.Platform;
 
 /**
@@ -24,14 +25,17 @@ public class Game
 	public Player player;
 	
 	public static ArrayList<Platform> platforms = new ArrayList<Platform>();
+	public static ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
+	
+	private int shootTimer = 0;
 	
 	//Set up initial variables
-	public Game() 
+	public Game(Player player) 
 	{
-		player = new Player();
+		this.player = player;
 		new Platform(100, 500, 200, 15);
 		new Platform(300, 400, 300, 25, 100, 0, 0.01, 0, true, false);
-		new Platform(100, 125, 100, 25, 0, 300, 0, 0.01, true, false);
+		new Platform(100, 125, 100, 25, 0, 350, 0, 0.01, true, false);
 		new Platform(300, 200, 100, 25, 200, 100, 0.01, 0.01, true, false);
 	}
 	
@@ -68,6 +72,26 @@ public class Game
 			pf.updatePlatform();
 		}
 		
+		ArrayList<Projectile> delete = new ArrayList<Projectile>();
+		
+		//Update all the projectiles
+		for(Projectile p: projectiles)
+		{
+			p.move();
+			
+			//If it is to be deleted
+			if(p.toBeDeleted)
+			{
+				delete.add(p);
+			}
+		}
+		
+		//Remove those projectiles that are to be deleted from the game
+		for(Projectile p: delete)
+		{
+			projectiles.remove(p);
+		}
+		
 		//If jumping and player is on the ground
 		if(key[KeyEvent.VK_UP] && player.y == player.floor)
 		{
@@ -91,12 +115,32 @@ public class Game
 		if(key[KeyEvent.VK_RIGHT])
 		{		
 			xa = player.speed;
+			player.direction = 1;
 		}
 		
 		//If moving left
 		if(key[KeyEvent.VK_LEFT])
 		{
 			xa = -player.speed;
+			player.direction = -1;
+		}
+		
+		//If shooting a projectile
+		if(key[KeyEvent.VK_V] && shootTimer == 0)
+		{
+			new Projectile(player.x, player.y - player.height,
+					0.02, 100, player.direction, 0);
+			shootTimer++;
+		}
+		
+		if(shootTimer > 0)
+		{
+			shootTimer++;
+		}
+		
+		if(shootTimer > 10001)
+		{
+			shootTimer = 0;
 		}
 		
 	   /*

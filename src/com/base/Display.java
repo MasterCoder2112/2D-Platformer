@@ -2,6 +2,7 @@ package com.base;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -10,6 +11,7 @@ import java.awt.RenderingHints;
 import javax.swing.JPanel;
 
 import com.entities.Player;
+import com.entities.Projectile;
 import com.input.InputHandler;
 import com.structures.Platform;
 
@@ -34,6 +36,7 @@ public class Display extends Canvas implements Runnable
 	private Game game;
 	private Image screen;
 	private Graphics graph;
+	public Player player;
 	
 	//Sets up variables
 	public Display() 
@@ -41,9 +44,10 @@ public class Display extends Canvas implements Runnable
 		//Handles key events 
 		input = new InputHandler();
 		addKeyListener(input);
+		player = new Player();
 		
 		//Starts new Game object for handling events
-		game = new Game();
+		game = new Game(player);
 	}
 	
 	//Repaints the screen
@@ -56,6 +60,17 @@ public class Display extends Canvas implements Runnable
 	    //Sets players color
 		graph.setColor(new Color(0, 0, 100));
 		
+		//If player is dead
+		if(!player.isAlive)
+		{
+			graph.setColor(new Color(255, 0, 0));
+		}
+		
+		//Sets font of any text drawn on the screen
+		graph.setFont(new Font("Nasalization", 1, 15));
+		
+		graph.drawString("Health: "+player.health, 25, 25);
+		
 		//Draws player
 		graph.fillRect((int)game.player.x, (int)game.player.topOfPlayer, game.player.girth,
 				(int)game.player.y - (int)game.player.topOfPlayer);
@@ -65,6 +80,13 @@ public class Display extends Canvas implements Runnable
 		{
 			Platform pf = Game.platforms.get(i);
 			graph.fillRect((int)pf.x, (int)pf.y, pf.width, pf.height);
+		}
+		
+		//Draw all the projectiles
+		for(int i = 0; i < Game.projectiles.size(); i++)
+		{
+			Projectile p = Game.projectiles.get(i);
+			graph.fillRect((int)p.x, (int)p.y, p.width, p.height);
 		}
 	
 	    // At the end of the method, draw the backBuffer to the 

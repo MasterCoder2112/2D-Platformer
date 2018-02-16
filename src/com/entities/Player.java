@@ -15,7 +15,7 @@ import com.structures.Platform;
  */
 public class Player 
 {
-	public static final double DEFAULT_SPEED = 0.01;
+	public static final double DEFAULT_SPEED = 0.015;
 	public static final double DEFAULT_JUMP_SPEED = 0.04;
 	public static final int DEFAULT_HEIGHT = 70;
 	
@@ -46,6 +46,7 @@ public class Player
 	public double extraMovementX;
 	public double extraMovementY;
 	public double maxAirHSpeed; //Max speed you can be in the air
+	public int direction = 1; //1 is right, -1 is left
 	
 	//public Inventory inventory = null;
 	
@@ -398,6 +399,23 @@ public class Player
 						platformOn = null;
 						extraMovementX = 0;
 						extraMovementY = 0;
+					}
+				}
+				
+				//If block is crushing player
+				if(y > pf.y + pf.height && topOfPlayer < pf.y + pf.height
+						&& topOfPlayer > pf.y)
+				{
+					height = DEFAULT_HEIGHT - Math.abs((pf.y + pf.height) - (y - height));
+					topOfPlayer = y - (DEFAULT_HEIGHT - Math.abs((pf.y + pf.height) - (y - height)));
+					
+					System.out.println(topOfPlayer);
+					
+					//If player is crushed (below crouch height)
+					if(height < (int)((5 * DEFAULT_HEIGHT) / 8))
+					{
+						health = 0;
+						isAlive = false;
 					}
 				}
 				
