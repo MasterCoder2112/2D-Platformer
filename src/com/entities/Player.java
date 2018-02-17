@@ -68,6 +68,7 @@ public class Player
 	public boolean swimming = false;
 	public boolean crouching = false;
 	public boolean running = false;
+	public boolean isStuck = false;
 	
 	/* GRAPHICAL CRAP *********************************/
 	
@@ -143,6 +144,7 @@ public class Player
 		{
 			horizontalMovement = xa;
 		}
+		
 		//TODO move crap
 		//If can move in this direction and player is not jumping
 		if(checkCollision(extraMovementX, 0) && !jumping)
@@ -151,7 +153,7 @@ public class Player
 		}
 		
 		//If can move in this direction
-		if(checkCollision(extraMovementY, 0))
+		if(checkCollision(0, extraMovementY))
 		{		
 			y += extraMovementY;
 		}
@@ -262,24 +264,31 @@ public class Player
 		else
 		{
 			maxAirHSpeed = 0;
-			//Slowly rise up to default height if not crouching
-			if(height < DEFAULT_HEIGHT)
+			
+			//TODO HERE2
+			//Only rise up if not stuck under a platform
+			if(!isStuck)
 			{
-				height += crouchAmount;
-				topOfPlayer -= crouchAmount;
-				
-				//If moving up got the player stuck in a platform, move
-				//the player back down
-				if(!checkCollision(0,0))
+				//System.out.println("HERE");
+				//Slowly rise up to default height if not crouching
+				if(height < DEFAULT_HEIGHT)
 				{
-					height -= crouchAmount;
-					topOfPlayer += crouchAmount;
+					height += crouchAmount;
+					topOfPlayer -= crouchAmount;
+					
+					//If moving up got the player stuck in a platform, move
+					//the player back down
+					if(!checkCollision(0,0))
+					{
+						height -= crouchAmount;
+						topOfPlayer += crouchAmount;
+					}
 				}
-			}
-			else
-			{
-				height = DEFAULT_HEIGHT;
-				topOfPlayer = (int)y - DEFAULT_HEIGHT;
+				else
+				{
+					height = DEFAULT_HEIGHT;
+					topOfPlayer = (int)y - DEFAULT_HEIGHT;
+				}
 			}
 		}
 
@@ -331,6 +340,12 @@ public class Player
     */
 	public boolean checkCollision(double xa, double ya)
 	{
+		//By default you can move
+		boolean canMove = true;
+		
+		//Are you still under a block
+		boolean underBlock = false;
+		
 		//The new X value
 		double newX = (x + xa);
 		
@@ -346,13 +361,13 @@ public class Player
 		//If player hits the ceiling here
 		if(newY - height < 0)
 		{
-			return false;
+			canMove = false;
 		}
 		
 		//If player hits bottom of the screen
 		if(newY + 30 > RunGame.HEIGHT)
 		{
-			return false;
+			canMove = false;
 		}
 		
 		//TODO Collision
@@ -369,7 +384,7 @@ public class Player
 				
 				//If block moves up and down, make sure to keep
 				//setting the players position to the top of the
-				//block
+				//block if the player is on it
 				if(y - height < pf.y && pf.ySpeed != 0
 						&& y < pf.y + pf.height)
 				{
@@ -404,22 +419,23 @@ public class Player
 				
 				//If block is crushing player
 				if(y > pf.y + pf.height && topOfPlayer < pf.y + pf.height
-						&& topOfPlayer > pf.y)
+						&& topOfPlayer > pf.y && pf.ySpeed != 0 && upSpeed == 0 && fallingSpeed == 0)
 				{
-					height = DEFAULT_HEIGHT - Math.abs((pf.y + pf.height) - (y - height));
-					topOfPlayer = y - (DEFAULT_HEIGHT - Math.abs((pf.y + pf.height) - (y - height)));
-					
-					System.out.println(topOfPlayer);
+					//System.out.println("Crushing: "+height);
+					underBlock = true;
+					isStuck = true;
+					height = (DEFAULT_HEIGHT - Math.abs((pf.y + pf.height) - (y - DEFAULT_HEIGHT))) + 0.5;
+					topOfPlayer = (y - height);
 					
 					//If player is crushed (below crouch height)
-					if(height < (int)((5 * DEFAULT_HEIGHT) / 8))
+					if(height < (int)((5 * DEFAULT_HEIGHT) / 8) + 0.5)
 					{
 						health = 0;
 						isAlive = false;
 					}
 				}
 				
-				return false;
+				canMove = false;
 			}
 			else
 			{
@@ -448,6 +464,12 @@ public class Player
 			}
 		}
 		
+		//If no longer under a block
+		if(!underBlock)
+		{
+			isStuck = false;
+		}
+		
 		//Defaultly, if no other floor height is set, set it to the level floor
 		if(floor >= RunGame.HEIGHT - 30)
 		{
@@ -459,6 +481,6 @@ public class Player
 			extraMovementX = 0;
 		}
 		
-		return true;
+		return canMove;
 	}
 }
