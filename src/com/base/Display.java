@@ -10,6 +10,7 @@ import java.awt.RenderingHints;
 
 import javax.swing.JPanel;
 
+import com.entities.Entity;
 import com.entities.Player;
 import com.entities.Projectile;
 import com.input.InputHandler;
@@ -36,7 +37,7 @@ public class Display extends Canvas implements Runnable
 	private Game game;
 	private Image screen;
 	private Graphics graph;
-	public Player player;
+	public static Player player;
 	
 	//Sets up variables
 	public Display() 
@@ -47,53 +48,87 @@ public class Display extends Canvas implements Runnable
 		player = new Player();
 		
 		//Starts new Game object for handling events
-		game = new Game(player);
+		game = new Game();
 	}
 	
 	//Repaints the screen
 	public void paint(Graphics g)
 	{
-		//Redraws screen
-	    screen = createImage(getWidth(),getHeight());
-	    graph = screen.getGraphics();
-		
-	    //Sets players color
-		graph.setColor(new Color(0, 0, 100));
-		
-		//If player is dead
-		if(!player.isAlive)
+		try
 		{
-			graph.setColor(new Color(255, 0, 0));
-		}
+			//Redraws screen
+		    screen = createImage(getWidth(),getHeight());
+		    graph = screen.getGraphics();
+			
+		    //Sets players color
+			graph.setColor(new Color(0, 0, 100));
+			
+			//Sets font of any text drawn on the screen
+			graph.setFont(new Font("Nasalization", 1, 15));
+			
+			//If player is dead
+			if(!Player.isAlive)
+			{
+				graph.setColor(new Color(255, 0, 0));
+				
+				graph.drawString("To Restart, press R", 125, 25);
+			}
+			
+			//Show players health
+			graph.drawString("Health: "+Player.health, 25, 25);
+			
+			//If player is in god mode
+			if(Player.godMode)
+			{
+				graph.drawString("God Mode: On", 150, 25);
+			}
+			
+			//Draws player
+			graph.fillRect((int)player.x, (int)player.topOfPlayer, player.girth,
+					(int)player.y - (int)player.topOfPlayer);
+			
+			//Draw all the platforms
+			for(int i = 0; i < Game.platforms.size(); i++)
+			{
+				Platform pf = Game.platforms.get(i);
+				graph.fillRect((int)pf.x, (int)pf.y, pf.width, pf.height);
+				//graph.fillOval((int)pf.x, (int)pf.y, pf.width, pf.height);
+			}
+			
+			//Draw all the platforms
+			for(int i = 0; i < Game.entities.size(); i++)
+			{
+				Entity e = Game.entities.get(i);
+				
+				if(e.isMeleeing)
+				{
+					graph.fillRect((int)e.x - (e.girth / 2), (int)e.topOfEntity + (int)(e.height / 2),
+							(int)e.y - (int)e.topOfEntity, e.girth);
+				}
+				else
+				{
+					graph.fillRect((int)e.x, (int)e.topOfEntity, e.girth, (int)e.y - (int)e.topOfEntity);
+				}
+			}
+			
+			//Draw all the projectiles
+			for(int i = 0; i < Game.projectiles.size(); i++)
+			{
+				Projectile p = Game.projectiles.get(i);
+				//graph.fillRect((int)p.x, (int)p.y, p.width, p.height);
+				graph.fillOval((int)p.x, (int)p.y, p.width, p.height);
+			}
 		
-		//Sets font of any text drawn on the screen
-		graph.setFont(new Font("Nasalization", 1, 15));
-		
-		graph.drawString("Health: "+player.health, 25, 25);
-		
-		//Draws player
-		graph.fillRect((int)game.player.x, (int)game.player.topOfPlayer, game.player.girth,
-				(int)game.player.y - (int)game.player.topOfPlayer);
-		
-		//Draw all the platforms
-		for(int i = 0; i < Game.platforms.size(); i++)
-		{
-			Platform pf = Game.platforms.get(i);
-			graph.fillRect((int)pf.x, (int)pf.y, pf.width, pf.height);
-		}
-		
-		//Draw all the projectiles
-		for(int i = 0; i < Game.projectiles.size(); i++)
-		{
-			Projectile p = Game.projectiles.get(i);
-			graph.fillRect((int)p.x, (int)p.y, p.width, p.height);
-		}
+		    // At the end of the method, draw the backBuffer to the 
+		    // screen.
+		    g.drawImage(screen, 0, 0, this);
 	
-	    // At the end of the method, draw the backBuffer to the 
-	    // screen.
-	    g.drawImage(screen, 0, 0, this);
-
-		g.dispose();
+			g.dispose();
+		}
+		catch(Exception e)
+		{
+			//Do nothing, we don't want these errors showing
+		}
 	}
 	
 	@Override

@@ -1,6 +1,7 @@
 package com.entities;
 
 import com.base.Game;
+import com.entities.Entity;
 import com.base.RunGame;
 import com.structures.Platform;
 
@@ -17,25 +18,25 @@ public class Player
 {
 	public static final double DEFAULT_SPEED = 0.015;
 	public static final double DEFAULT_JUMP_SPEED = 0.04;
-	public static final int DEFAULT_HEIGHT = 70;
+	public static final int DEFAULT_HEIGHT = 75;
 	
 	public Platform platformOn;
 	
 	//Things that the player may or may not have in the future
-	public int health;
-	public int armor;
-	public int ammo;
-	public int shield;
-	public double x;
-	public double y;
+	public static int health;
+	public static int armor;
+	public static int ammo;
+	public static int shield;
+	public static double x;
+	public static double y;
 	
 	//Where the current floor for the player is
-	public double floor;
+	public static double floor;
 	
 	//public Weapon[] weapons = null;
-	public int weight;
-	public double height;
-	public int girth;
+	public static int weight;
+	public static double height;
+	public static int girth;
 	
 	/* MOVEMENT VARIABLES ******************************/
 	
@@ -61,7 +62,7 @@ public class Player
 	public int lowGravity;
 	
 	/* Player flags ************************************/
-	public boolean isAlive = true;
+	public static boolean isAlive = true;
 	public boolean inAir = false;
 	public boolean firing = false;
 	public boolean jumping = false;
@@ -69,6 +70,7 @@ public class Player
 	public boolean crouching = false;
 	public boolean running = false;
 	public boolean isStuck = false;
+	public static boolean godMode = false;
 	
 	/* GRAPHICAL CRAP *********************************/
 	
@@ -145,7 +147,6 @@ public class Player
 			horizontalMovement = xa;
 		}
 		
-		//TODO move crap
 		//If can move in this direction and player is not jumping
 		if(checkCollision(extraMovementX, 0) && !jumping)
 		{		
@@ -370,7 +371,76 @@ public class Player
 			canMove = false;
 		}
 		
-		//TODO Collision
+	   /*
+	    * Make sure player cannot go through an entity in the game either
+	    */
+		for(Entity e: Game.entities)
+		{
+			if(((newX <= e.x + e.girth && newX + girth > e.x + 1)) 
+					&& ((newY > e.y - e.height && newY - height <= e.y)))
+			{
+				extraMovementY = e.upSpeed;
+				
+				//If entity moves up and down, make sure to keep
+				//setting the players position to the top of the
+				//entity if the player is on it
+				if(y - height < e.y - e.height && e.upSpeed != 0
+						&& y < e.y)
+				{
+					y = e.y - e.height;
+				}
+				
+				//Update where the floor is based on the players position each tick as well.
+				if(y <= e.y - e.height && floor > e.y - e.height)
+				{					
+					floor = e.y - e.height;
+				}
+				else
+				{
+					//If the floor is below or the same as the levels floor value.
+					if(floor >= RunGame.HEIGHT - 30)
+					{
+						floor = RunGame.HEIGHT - 30;
+					}
+				}
+				
+				//If entity is crushing player
+				if(y > e.y && topOfPlayer < e.y
+						&& topOfPlayer > e.y - e.height && e.upSpeed > 0 && upSpeed == 0 
+						&& fallingSpeed == 0 && e.weight > 10)
+				{
+					underBlock = true;
+					isStuck = true;
+					height = (DEFAULT_HEIGHT - Math.abs((e.y) - (y - DEFAULT_HEIGHT))) + 0.5;
+					topOfPlayer = (y - height);
+					
+					//If player is crushed (below crouch height)
+					if(height < (int)((5 * DEFAULT_HEIGHT) / 8) + 0.5)
+					{
+						health = 0;
+						isAlive = false;
+					}
+				}
+				
+				canMove = false;
+			}
+			else
+			{
+				//Update where the floor is based on the players position each tick as well.
+				if(y <= e.y - e.height && floor > e.y - e.height && 
+						(newX <= e.x + e.girth && newX + girth > e.x + 1))
+				{	
+					floor = e.y - e.height;
+					
+					//Only if on the top of the entity
+					if(Math.abs(floor - y) < 0.05)
+					{
+						extraMovementY = e.upSpeed;
+					}
+				}
+			}
+		}
+
 		//Check all platforms to see if the player is inside of them
 		for(Platform pf: Game.platforms)
 		{
@@ -421,14 +491,14 @@ public class Player
 				if(y > pf.y + pf.height && topOfPlayer < pf.y + pf.height
 						&& topOfPlayer > pf.y && pf.ySpeed != 0 && upSpeed == 0 && fallingSpeed == 0)
 				{
-					//System.out.println("Crushing: "+height);
 					underBlock = true;
 					isStuck = true;
 					height = (DEFAULT_HEIGHT - Math.abs((pf.y + pf.height) - (y - DEFAULT_HEIGHT))) + 0.5;
 					topOfPlayer = (y - height);
 					
-					//If player is crushed (below crouch height)
-					if(height < (int)((5 * DEFAULT_HEIGHT) / 8) + 0.5)
+					//If player is crushed (below crouch height) and not in godMode
+					if(height < (int)((5 * DEFAULT_HEIGHT) / 8) + 0.5
+							&& !Player.godMode)
 					{
 						health = 0;
 						isAlive = false;
@@ -482,5 +552,23 @@ public class Player
 		}
 		
 		return canMove;
+	}
+	
+   /**
+    * Hurt the player with a variable amount of damage, and if the players health goes
+    * below 0, then the player is dead.
+    * @param damage
+    */
+	public static void hurt(double damage)
+	{
+		if(!godMode)
+		{
+			health -= damage;
+			
+			if(health <= 0)
+			{
+				isAlive = false;
+			}
+		}
 	}
 }
