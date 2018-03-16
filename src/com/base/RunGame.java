@@ -21,7 +21,7 @@ public class RunGame
 	public static JFrame frame;
 	public static Display display;
 	private String dev = "Infdev";
-	private double versionNum = 0.2;
+	private double versionNum = 0.25;
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 600;
 	
@@ -46,7 +46,7 @@ public class RunGame
 		    * Self explanitory stuff
 		    */
 			display = new Display();
-			frame = new JFrame("Excelcior Version "+dev+" "+versionNum);
+			frame = new JFrame("Excelsior Version "+dev+" "+versionNum);
 			frame.add(display);
 			frame.setSize(WIDTH, HEIGHT);
 			frame.getContentPane().setCursor(blank);

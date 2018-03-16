@@ -4,12 +4,10 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.RenderingHints;
-
-import javax.swing.JPanel;
-
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
 import com.entities.Entity;
 import com.entities.Player;
 import com.entities.Projectile;
@@ -30,7 +28,6 @@ public class Display extends Canvas implements Runnable
 {
 	private static final long serialVersionUID = 1L;
 	
-	
 	private InputHandler input;
 	public static Thread mainThread;
 	private boolean isRunning = true;
@@ -38,6 +35,10 @@ public class Display extends Canvas implements Runnable
 	private Image screen;
 	private Graphics graph;
 	public static Player player;
+	
+	//BufferedImages for graphics
+	private BufferedImage playerRight;
+	private BufferedImage playerLeft;
 	
 	//Sets up variables
 	public Display() 
@@ -49,6 +50,9 @@ public class Display extends Canvas implements Runnable
 		
 		//Starts new Game object for handling events
 		game = new Game();
+		
+		//Loads all graphics into the game
+		loadGraphics();
 	}
 	
 	//Repaints the screen
@@ -61,7 +65,7 @@ public class Display extends Canvas implements Runnable
 		    graph = screen.getGraphics();
 			
 		    //Sets players color
-			graph.setColor(new Color(0, 0, 100));
+			graph.setColor(new Color(0x00007b));
 			
 			//Sets font of any text drawn on the screen
 			graph.setFont(new Font("Nasalization", 1, 15));
@@ -80,12 +84,21 @@ public class Display extends Canvas implements Runnable
 			//If player is in god mode
 			if(Player.godMode)
 			{
-				graph.drawString("God Mode: On", 150, 25);
+				graph.drawString("God Mode: On", 350, 25);
 			}
 			
+			BufferedImage playerImage = playerLeft;
+			
+			//Change image depending on direction
+			if(player.direction == 1)
+			{
+				playerImage = playerRight;
+			}
+			
+			//TODO player stuff
 			//Draws player
-			graph.fillRect((int)player.x, (int)player.topOfPlayer, player.girth,
-					(int)player.y - (int)player.topOfPlayer);
+			graph.drawImage(playerImage, (int)player.x, (int)player.topOfPlayer, player.girth,
+					(int)player.y - (int)player.topOfPlayer, null);
 			
 			//Draw all the platforms
 			for(int i = 0; i < Game.platforms.size(); i++)
@@ -129,6 +142,65 @@ public class Display extends Canvas implements Runnable
 		{
 			//Do nothing, we don't want these errors showing
 		}
+	}
+	
+   /**
+    * Load all graphics images in and scan for transparency pixels
+    */
+	public void loadGraphics()
+	{
+		//Try to load graphics file
+		try
+		{
+			playerLeft = ImageIO.read
+					(new File("resources/playerLeft.png"));
+		}
+		catch(Exception e)
+		{
+			System.out.println("Image can't be found");
+			//Leave as default black box if no textures found
+		}
+		
+		//Effectively makes all white pixels in image transparent
+		/*for (int x = 0; x < playerLeft.getWidth(); ++x)
+		{
+			for (int y = 0; y < playerLeft.getHeight(); ++y)
+			{
+				//Masks RGB value at a given x, y pixel in the image, and if
+				//it is white (0xFFFFFF) then set that pixel to being transparent
+				//(aka. a value of 0)
+				if ((playerLeft.getRGB(x, y) & 0x00FFFFFF) == 0xFFFFFF) 
+				{
+				    playerLeft.setRGB(x, y, 0);
+				}
+			}
+		}*/
+		
+		//Try to load graphics file
+		try
+		{
+			playerRight = ImageIO.read
+					(new File("resources/playerRight.png"));
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Effectively makes all white pixels in image transparent
+		/*for (int x = 0; x < playerRight.getWidth(); ++x)
+		{
+			for (int y = 0; y < playerRight.getHeight(); ++y)
+			{
+				//Masks RGB value at a given x, y pixel in the image, and if
+				//it is white (0xFFFFFF) then set that pixel to being transparent
+				//(aka. a value of 0)
+				if ((playerRight.getRGB(x, y) & 0x00FFFFFF) == 0xFFFFFF) 
+				{
+				    playerRight.setRGB(x, y, 0);
+				}
+			}
+		}*/
 	}
 	
 	@Override

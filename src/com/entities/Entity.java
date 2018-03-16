@@ -111,7 +111,7 @@ public class Entity
 			shield = 50;
 			weight = 1;
 			height = 75;
-			girth = 40;
+			girth = 45;
 			damage = 10;
 			speed = 0.005;
 			shotDelay = 10000;
@@ -155,15 +155,23 @@ public class Entity
 		startHeight = height;
 		startSpeed = speed;
 		
-		//Add entity to the game
-		Game.entities.add(this);
+		//If entity is friendly, it don't hurt you
+		if(isFriendly)
+		{
+			damage = 0;
+			canShoot = false;
+			canMelee = false;
+		}
 	}
 	
    /**
     * Updates entity values such as movement, attack phase, graphics, etc..
     */
 	public void updateEntity()
-	{	
+	{
+		//Always update the top of entity value so the graphical value doesn't glitch out.
+		topOfEntity = y - height;
+		
 		//By default the entity is not crouching
 		crouching = false;
 		
@@ -249,28 +257,16 @@ public class Entity
 		}
 		
 	   /*
-	    * If on the same level as the player (at least for now)
+	    * Player and the entity are alive
 	    */
-		if(Player.isAlive)
+		if(Player.isAlive && isAlive)
 		{
-			//TODO Fix jumping
-			
 			//If player is above entity, and the entity is not already
 			//in the air and player is not standing on top of the entity
-			//if(Player.y < topOfEntity && y == floor && !targetOnTop)
-			//{
-				//jumping = true;
-				//upSpeed = 0.04;
-			//}
-			
-		   /*
-		    * Only crouch of the entity cannot see the player and 
-		    * the player is below the entity
-		    */
-			if(((!checkEyeSight()) && Player.y >= topOfEntity) 
-					&& !targetOnTop)
+			if(Player.y < topOfEntity && y == floor && !targetOnTop)
 			{
-				crouching = true;
+				jumping = true;
+				upSpeed = 0.04;
 			}
 			
 			//If the entity can shoot/hit target
@@ -343,6 +339,19 @@ public class Entity
 					}
 				}
 			}
+			else
+			{
+			   /*
+			    * Only crouch of the entity cannot see the player and 
+			    * the player is below the entity and the entity is supposed
+			    * to check its eyesight now.
+			    */
+				if(shootTimer == 0 && ((!checkEyeSight()) && Player.y >= topOfEntity) 
+						&& !targetOnTop)
+				{
+					crouching = true;
+				}
+			}
 		}
 		
 		//Reset shootTimer if needed, otherwise just keep counting the delay
@@ -368,7 +377,7 @@ public class Entity
 		
 		//Checks the entities position and updates the floor values and such
 		//based on it.
-		checkCollision(0,0);
+		updateCollision(0,0);
 		
 		//If target is on top of entity, move the entity in the forward
 		//direction (really could be any though) to edge the target off
@@ -396,7 +405,7 @@ public class Entity
 		
 		//If player is dead (at least for now) stop moving, or if the
 		//entity cannot move
-		if(!Player.isAlive || !canMove)
+		if(!Player.isAlive || !canMove || !isAlive)
 		{
 			xa = 0;
 		}
@@ -413,7 +422,7 @@ public class Entity
 				xa /= 3;
 				
 				//If player can move in this direction
-				if(checkCollision(xa, 0))
+				if(checkCollision(xa, 0, null))
 				{		
 					x += xa;
 				}
@@ -424,13 +433,13 @@ public class Entity
 			}
 			
 			//If can move in this direction and entity is not jumping
-			if(checkCollision(extraMovementX, 0) && !jumping)
+			if(checkCollision(extraMovementX, 0, null) && !jumping)
 			{		
 				x += extraMovementX;
 			}
 			
 			//If can move in this direction
-			if(checkCollision(0, extraMovementY))
+			if(checkCollision(0, extraMovementY, null))
 			{		
 				y += extraMovementY;
 			}
@@ -438,7 +447,7 @@ public class Entity
 			//TODO fix horizontal crap with jumping
 			
 			//If can move in this direction
-			if(checkCollision(horizontalMovement, 0))
+			if(checkCollision(horizontalMovement, 0, null))
 			{		
 				x += horizontalMovement;
 			}
@@ -455,94 +464,98 @@ public class Entity
 				x = -girth + 10;
 			}
 			
-			//If jumping
-			if(jumping)
-			{	
-				//Move entity up but decrease speed each time by gravity
-				//But the entity has to be able to move upward to do this
-				if(checkCollision(0, -upSpeed) && upSpeed > 0)
+			//If alive, it can jump and crouch
+			if(isAlive)
+			{
+				//If jumping
+				if(jumping)
 				{	
-					y -= upSpeed;
-					upSpeed -= Game.GRAVITY;
-				}
-				else
-				{
-					jumping = false;
-					upSpeed = 0;
-					fallingSpeed = 0;
-				}
-			}
-			
-			double crouchAmount = 0.01;
-			
-			//If crouching
-			if(crouching)
-			{
-				//Target height if crouching
-				int newHeight = (int)((5 * startHeight) / 8);
-				
-				//Slowly lower yourself if crouching until you reach the 
-				//desired height. Also correct graphics for such
-				if(height > newHeight)
-				{
-					height -= crouchAmount;
-					topOfEntity += crouchAmount;
-				}
-				else
-				{
-					height = newHeight;
-					topOfEntity = (int)y - height;
-				}
-				
-				//If in the air, crouching speeds the entity up, otherwise
-				//it slows the entity down
-				if(inAir)
-				{
-				   /*
-				    * Only do once per jump, but if in the air and you
-				    * crouch, your speed will be increased once and
-				    * only once so it doesn't keep compounding on itself.
-				    */
-					if(maxAirHSpeed == 0)
-					{
-						//TODO FIXX
-						maxAirHSpeed = startSpeed * direction * 1.25;
-						horizontalMovement = maxAirHSpeed;
-						System.out.println(maxAirHSpeed);
-					}
-					
-					speed = speed * 1.25;
-				}
-				else
-				{
-					speed = startSpeed / 2;
-				}
-			}
-			else
-			{
-				maxAirHSpeed = 0;
-				
-				//Only rise up if not stuck under a platform
-				if(!isStuck)
-				{
-					//Slowly rise up to default height if not crouching
-					if(height < startHeight)
-					{
-						height += crouchAmount;
-						topOfEntity -= crouchAmount;
-						
-						//If moving up got the entity stuck in a platform, move
-						//the entity back down
-						if(!checkCollision(0,0))
-						{
-							height -= crouchAmount;
-							topOfEntity += crouchAmount;
-						}
+					//Move entity up but decrease speed each time by gravity
+					//But the entity has to be able to move upward to do this
+					if(checkCollision(0, -upSpeed, null)
+							&& !targetOnTop)
+					{	
+						y -= upSpeed;
+						upSpeed -= Game.GRAVITY;
 					}
 					else
 					{
-						height = startHeight;
-						topOfEntity = (int)y - startHeight;
+						jumping = false;
+						upSpeed = 0;
+						fallingSpeed = 0;
+					}
+				}
+				
+				double crouchAmount = 0.01;
+				
+				//If crouching
+				if(crouching)
+				{
+					//Target height if crouching
+					int newHeight = (int)((5 * startHeight) / 8);
+					
+					//Slowly lower yourself if crouching until you reach the 
+					//desired height. Also correct graphics for such
+					if(height > newHeight)
+					{
+						height -= crouchAmount;
+						topOfEntity += crouchAmount;
+					}
+					else
+					{
+						height = newHeight;
+						topOfEntity = (int)y - height;
+					}
+					
+					//If in the air, crouching speeds the entity up, otherwise
+					//it slows the entity down
+					if(inAir)
+					{
+					   /*
+					    * Only do once per jump, but if in the air and you
+					    * crouch, your speed will be increased once and
+					    * only once so it doesn't keep compounding on itself.
+					    */
+						if(maxAirHSpeed == 0)
+						{
+							//TODO FIXX
+							maxAirHSpeed = startSpeed * direction * 1.25;
+							horizontalMovement = maxAirHSpeed;
+						}
+						
+						speed = speed * 1.25;
+					}
+					else
+					{
+						speed = startSpeed / 2;
+					}
+				}
+				else
+				{
+					maxAirHSpeed = 0;
+					
+					//Only rise up if not stuck under a platform
+					if(!isStuck)
+					{
+						//Slowly rise up to default height if not crouching
+						if(height < startHeight)
+						{
+							height += crouchAmount;
+							topOfEntity -= crouchAmount;
+							
+							//If moving up got the entity stuck in a platform, move
+							//the entity back down
+							if(!checkCollision(0, 0, null))
+							{
+								height -= crouchAmount;
+								topOfEntity += crouchAmount;
+							}
+						}
+						else
+						{
+							height = startHeight;
+							topOfEntity = (int)y - startHeight;
+						}
 					}
 				}
 			}
@@ -589,20 +602,15 @@ public class Entity
 	}
 	
    /**
-    * Checks the collision of the entity with the surrounding platforms,
-    * other entities, players, etc... If false is returned, it cannot move
-    * with the xa and ya sent into this.
+    * Check to make sure the player can move in any direction and not
+    * 
     * @param xa
-    * @param ya
     * @return
     */
-	public boolean checkCollision(double xa, double ya)
+	public boolean updateCollision(double xa, double ya)
 	{
 		//By default you can move
 		boolean canMove = true;
-		
-		//Is Entity still under a block
-		boolean underBlock = false;
 		
 		//The new X value
 		double newX = (x + xa);
@@ -613,18 +621,24 @@ public class Entity
 		//Set floor back to the bottom of the level each time by default
 		floor = RunGame.HEIGHT - 30;
 		
-		//Reset whether entity is on a platform or not
+		//Reset whether player is on a platform or not
 		platformOn = null;
 		
-		//If entity hits the ceiling here
-		if(newY - height < 0)
+		//If player hits the ceiling here
+		if(newY - height <= 0)
 		{
+			jumping = false;
 			canMove = false;
 		}
 		
 		//If player hits bottom of the screen
-		if(newY + 30 > RunGame.HEIGHT)
+		if(newY + 30 >= RunGame.HEIGHT)
 		{
+			fallingSpeed = 0;
+			inAir = false;
+			floor = RunGame.HEIGHT - 30;
+			extraMovementX = 0;
+			extraMovementY = 0;
 			canMove = false;
 		}
 		
@@ -633,10 +647,10 @@ public class Entity
 	    */
 		for(Entity e: Game.entities)
 		{
-			if(!e.equals(this) && ((newX <= e.x + e.girth && newX + girth > e.x + 1)) 
+			if(((newX <= e.x + e.girth && newX + girth > e.x + 1)) 
 					&& ((newY > e.y - e.height && newY - height <= e.y)))
 			{
-				extraMovementY = e.upSpeed;
+				extraMovementY += e.upSpeed;
 				
 				//If entity moves up and down, make sure to keep
 				//setting the players position to the top of the
@@ -661,23 +675,7 @@ public class Entity
 					}
 				}
 				
-				//If entity is crushing player
-				if(y > e.y && y - height < e.y
-						&& y - height > e.y - e.height && e.upSpeed > 0 && upSpeed == 0 
-						&& fallingSpeed == 0 && e.weight > 10)
-				{
-					underBlock = true;
-					isStuck = true;
-					height = (startHeight - Math.abs((e.y) - (y - startHeight))) + 0.5;
-					topOfEntity = (y - height);
-					
-					//If player is crushed (below crouch height)
-					if(height < (int)((5 * startHeight) / 8) + 0.5)
-					{
-						health = 0;
-						isAlive = false;
-					}
-				}
+				//TODO add entity crushing player if weight is above certain limit
 				
 				canMove = false;
 			}
@@ -692,7 +690,7 @@ public class Entity
 					//Only if on the top of the entity
 					if(Math.abs(floor - y) < 0.05)
 					{
-						extraMovementY = e.upSpeed;
+						extraMovementY += e.upSpeed;
 					}
 				}
 			}
@@ -704,10 +702,13 @@ public class Entity
 			if(((newX <= pf.x + pf.width && newX + girth > pf.x + 1)) 
 					&& ((newY > pf.y && newY - height <= pf.y + pf.height)))
 			{
-				//The extra movement added to the player when he is on 
-				//a moving platform both horizontally and vertically
-				extraMovementX = pf.xSpeed;
-				extraMovementY = pf.ySpeed;
+			   /*
+			    * Add to extraMovement each time, because if there is a negative
+			    * movement and a positive movement(assuming player isn't being 
+			    * crushed either) then the forces would cancel out.
+			    */
+				extraMovementX += pf.xSpeed;
+				extraMovementY += pf.ySpeed;
 				
 				//If block moves up and down, make sure to keep
 				//setting the players position to the top of the
@@ -719,7 +720,7 @@ public class Entity
 				}
 				
 				//Update where the floor is based on the players position each tick as well.
-				if(y <= pf.y && floor > pf.y + pf.height)
+				if(y <= pf.y && floor >= pf.y + pf.height)
 				{
 				   /*
 				    * If the player is directly over or on this platform, set this platform
@@ -735,25 +736,38 @@ public class Entity
 					horizontalMovement = extraMovementX;
 					
 					//If the floor is below or the same as the levels floor value.
+					//Then say the player is not on a platform and reset the floor value.
 					if(floor >= RunGame.HEIGHT - 30)
 					{
 						floor = RunGame.HEIGHT - 30;
 						platformOn = null;
-						extraMovementX = 0;
-						extraMovementY = 0;
 					}
 				}
 				
-				//If block is crushing the entity
-				if(y > pf.y + pf.height && y - height < pf.y + pf.height
-						&& y - height > pf.y && pf.ySpeed != 0 && upSpeed == 0 && fallingSpeed == 0)
+				//If block is crushing player vertically
+				if(!checkCollision(0, pf.ySpeed, pf))
 				{
-					underBlock = true;
 					isStuck = true;
-					height = (startHeight - Math.abs((pf.y + pf.height) - (y - startHeight))) + 0.5;
-					topOfEntity = (y - height);
 					
-					//If player is crushed (below crouch height)
+					//If platform is moving down to crush the player
+					if(pf.ySpeed > 0)
+					{
+						height = (startHeight - Math.abs((pf.y + pf.height)
+								- (y - startHeight))) + 0.5;
+						topOfEntity = (y - height);
+					}
+					//If platform is moving up and crushing the player into something
+					else if(pf.ySpeed < 0)
+					{
+						//Decrease height steadily instead of all at once
+						height -= ((y - Math.abs((pf.y + pf.ySpeed))));
+						y = topOfEntity + height;
+						topOfEntity = y - height;
+					}
+					
+					newY = y + ya;
+					
+					//If entity is crushed (below crouch height)
 					if(height < (int)((5 * startHeight) / 8) + 0.5)
 					{
 						health = 0;
@@ -761,16 +775,32 @@ public class Entity
 					}
 				}
 				
-				//In order to move, the entity tries to crouch under the 
-				//platform to move first
-				crouching = true;
+			   /*
+			    * Checks if entity can move forward (while ignoring the block
+			    * currently touching the entity and moving it) and also checks
+			    * to make sure the entity can't move backwards as well so that the entity
+			    * is for sure being crushed. Also the xSpeed of the platform that is pushing
+			    * the entity in this check is not 0, because then it shouldn't be crushing
+			    * the entity.
+			    */
+				if(!checkCollision(pf.xSpeed, 0, pf)
+						&& !checkCollision(-pf.xSpeed, 0, null)
+						&& pf.xSpeed != 0.0)
+				{
+					isStuck = true;
+					
+					//Player can crouch to avoid being crushed vertically,
+					//but there ain't nothing you can do horizontally
+					health = 0;
+					isAlive = false;
+				}
 				
 				canMove = false;
 			}
 			else
 			{
 				//Update where the floor is based on the players position each tick as well.
-				if(y <= pf.y && floor > pf.y + pf.height && 
+				if(y <= pf.y && floor >= pf.y && 
 						(newX <= pf.x + pf.width && newX + girth > pf.x + 1))
 				{
 				   /*
@@ -787,11 +817,19 @@ public class Entity
 					{
 						//The extra movement added to the player when he is on 
 						//a moving platform both horizontally and vertically
-						extraMovementX = pf.xSpeed;
-						extraMovementY = pf.ySpeed;
+						extraMovementX += pf.xSpeed;
+						extraMovementY += pf.ySpeed;
 					}
 				}
 			}
+		}
+		
+		//If Entity is above the player, set the floor to being the players
+		//head
+		if((newX <= Player.x + Player.girth && newX + girth > Player.x)
+				&& newY <= Player.y - Player.height)
+		{
+			floor = Player.y - Player.height;
 		}
 		
 		//Don't allow entity to move into the player. Unless the player is above
@@ -824,12 +862,6 @@ public class Entity
 			targetOnTop = false;
 		}
 		
-		//If no longer under a block
-		if(!underBlock)
-		{
-			isStuck = false;
-		}
-		
 		//Defaultly, if no other floor height is set, set it to the level floor
 		if(floor >= RunGame.HEIGHT - 30)
 		{
@@ -837,11 +869,75 @@ public class Entity
 			
 			//If it gets here, the player is not on a platform
 			platformOn = null;
-			
-			extraMovementX = 0;
 		}
 		
 		return canMove;
+	}
+	
+   /**
+    * Check to make sure the player can move in any direction and not.
+    * It does not do what updateCollision does and update movement 
+    * variables and such. It only updates whether the player can move
+    * in a given direction based on the movement variables already calculated
+    * beforehand.
+    * 
+    * @param xa, ya, exclude
+    * @return
+    */
+	public boolean checkCollision(double xa, double ya, Platform exclude)
+	{
+		//The new X value
+		double newX = (x + xa);
+		
+		//The new Y value
+		double newY = (y + ya);
+		
+		//If player hits the ceiling here
+		if(newY - height < 0)
+		{
+			return false;
+		}
+		
+		//If player hits bottom of the screen
+		if(newY + 30 > RunGame.HEIGHT)
+		{
+			return false;
+		}
+		
+	   /*
+	    * Make sure player cannot go through an entity in the game either
+	    */
+		for(Entity e: Game.entities)
+		{
+			if(!e.equals(this) && ((newX <= e.x + e.girth && newX + girth > e.x + 1)) 
+					&& ((newY > e.y - e.height && newY - height <= e.y)))
+			{			
+				return false;
+			}
+		}
+
+		//Check all platforms to see if the player is inside of them
+		for(Platform pf: Game.platforms)
+		{
+			if(((newX <= pf.x + pf.width && newX + girth > pf.x + 1)) 
+					&& ((newY > pf.y && newY - height <= pf.y + pf.height)))
+			{	
+				if(exclude == null || (exclude != null && !pf.equals(exclude)))
+				{
+					return false;
+				}
+			}
+		}
+		
+		//Do not allow the entity to move into the player either
+		if(((newX <= Player.x + Player.girth && newX + girth > Player.x)) 
+				&& ((newY > Player.y - Player.height && newY - height <= Player.y))
+				&& !targetOnTop)
+		{
+			return false;
+		}
+		
+		return true;
 	}
 	
    /**
@@ -970,10 +1066,10 @@ public class Entity
     */
 	private boolean checks(Point pointOnTarget, double targetWidth, double targetHeight)
 	{
-		//TODO eyesight crap
 		//Where the eyesight vector is currently at in the horizontal plane
 		double eyeX = x;
 		double eyeY = y - ((height * 7) / 8);
+		double eyeSpeed = 3;
 		
 		//If facing to the right, eyeX starts at a different location
 		if(direction == 1)
@@ -988,10 +1084,10 @@ public class Entity
 		double distanceY = Math.abs(pointOnTarget.y - eyeY);
 		
 		//How fast in what direction the eyesight should move
-		double xMove = 1 * direction;
+		double xMove = eyeSpeed * direction;
 		
 		//If target is closer than 1 pixel away
-		if(distanceX < 1)
+		if(distanceX < eyeSpeed)
 		{
 			xMove = distanceX * direction;
 		}
@@ -1011,7 +1107,7 @@ public class Entity
 		    * Fixes speed issues when Math.tan(upAngle) is less than 1 making
 		    * ya greater than the speed that the projectile should be.
 		    */
-			if(Math.abs(yMove) > 1)
+			if(Math.abs(yMove) > eyeSpeed)
 			{
 				//Figures out how many times the speed goes into the calculated
 				//speed in the y direction. Then divides the change in x by that
@@ -1019,7 +1115,7 @@ public class Entity
 				//the same.
 				xMove /= yMove;
 
-				yMove = 1;
+				yMove = eyeSpeed;
 			}
 			
 			//Move the eyesight upward on screen if the player is above the entity
@@ -1032,13 +1128,13 @@ public class Entity
 		{
 			//Default y movement is downward on the screen
 			//if there is no x movement
-			yMove = 1;
+			yMove = eyeSpeed;
 			
 			upAngle = 0;
 			
 			//If the player is less than one pixel below the
 			//entity, then set yMovement to just that distance
-			if(distanceY < 1)
+			if(distanceY < eyeSpeed)
 			{
 				yMove = distanceY;
 			}

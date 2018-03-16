@@ -21,6 +21,8 @@ public class Platform
 	public int endY;
 	public double xSpeed;
 	public double ySpeed;
+	public int xMoveDist;
+	public int yMoveDist;
 	
 	//Position variables
 	public double x;
@@ -55,15 +57,14 @@ public class Platform
 		this.ySpeed = ySpeed;
 		this.isSolid = isSolid;
 		this.isLiquid = isLiquid;
+		this.xMoveDist = xMoveDist;
+		this.yMoveDist = yMoveDist;
 		
 		//If the platform is supposed to move
 		if(startX != endX || startY != endY)
 		{
 			isMoving = true;
 		}
-		
-		//Add to the game
-		Game.platforms.add(this);
 	}
 	
 	//Minimal variables needed for a non-moving default platform
