@@ -7,12 +7,15 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+
 import javax.imageio.ImageIO;
+
 import com.entities.Entity;
 import com.entities.Player;
 import com.entities.Projectile;
 import com.input.InputHandler;
 import com.structures.Platform;
+import com.structures.Unit;
 
 /**
  * @title Display
@@ -36,9 +39,26 @@ public class Display extends Canvas implements Runnable
 	private Graphics graph;
 	public static Player player;
 	
+	//Controls all sounds and music
+	private SoundController sc;
+	
 	//BufferedImages for graphics
-	private BufferedImage playerRight;
-	private BufferedImage playerLeft;
+	private BufferedImage player1;
+	private BufferedImage player2;
+	private BufferedImage player3;
+	private BufferedImage player4;
+	private BufferedImage playerStopped;
+	private BufferedImage playerDead;
+	private BufferedImage background;
+	private BufferedImage texture1;
+	private BufferedImage texture2;
+	private BufferedImage texture3;
+	private BufferedImage texture4;
+	private BufferedImage entity1;
+	private BufferedImage entity2;
+	private BufferedImage entity3;
+	private BufferedImage entity4;
+	private BufferedImage entityDead;
 	
 	//Sets up variables
 	public Display() 
@@ -59,7 +79,7 @@ public class Display extends Canvas implements Runnable
 	public void paint(Graphics g)
 	{
 		try
-		{
+		{	
 			//Redraws screen
 		    screen = createImage(getWidth(),getHeight());
 		    graph = screen.getGraphics();
@@ -69,6 +89,10 @@ public class Display extends Canvas implements Runnable
 			
 			//Sets font of any text drawn on the screen
 			graph.setFont(new Font("Nasalization", 1, 15));
+			
+			//Draws Background
+			graph.drawImage(background, 0, 0, RunGame.WIDTH,
+					RunGame.HEIGHT, null);
 			
 			//If player is dead
 			if(!Player.isAlive)
@@ -87,31 +111,125 @@ public class Display extends Canvas implements Runnable
 				graph.drawString("God Mode: On", 350, 25);
 			}
 			
-			BufferedImage playerImage = playerLeft;
+			BufferedImage playerImage = player2;
 			
-			//Change image depending on direction
+			//Determine player image depending on how long player was
+			//moving for.
+			if(Game.playerMovement != 0)
+			{
+				if(Game.playerMovement < 4000)
+				{
+					playerImage = player1;
+				}
+				else if(Game.playerMovement < 8000)
+				{
+					playerImage = player2;
+				}
+				else if(Game.playerMovement < 12000)
+				{
+					playerImage = player3;
+				}
+				else if(Game.playerMovement < 16000)
+				{
+					playerImage = player4;
+				}
+			}
+			else
+			{
+				playerImage = playerStopped;
+			}
+			
+			if(!Player.isAlive)
+			{
+				playerImage = playerDead;
+			}
+				
+			//Draws player depending on direction the player is facing
 			if(player.direction == 1)
 			{
-				playerImage = playerRight;
+				graph.drawImage(playerImage, (int)player.x,
+						(int)player.topOfPlayer, player.girth,
+					((int)player.y - (int)player.topOfPlayer), null);
+			}
+			else
+			{
+				graph.drawImage(playerImage, (int)player.x + player.girth,
+						(int)player.topOfPlayer, -player.girth,
+					((int)player.y - (int)player.topOfPlayer), null);
 			}
 			
-			//TODO player stuff
-			//Draws player
-			graph.drawImage(playerImage, (int)player.x, (int)player.topOfPlayer, player.girth,
-					(int)player.y - (int)player.topOfPlayer, null);
+			graph.drawRect((int)player.x,
+					(int)player.topOfPlayer, player.girth,
+				((int)player.y - (int)player.topOfPlayer));
 			
 			//Draw all the platforms
-			for(int i = 0; i < Game.platforms.size(); i++)
+			for(int i = 0; i < Game.currentMap.platforms.size(); i++)
 			{
-				Platform pf = Game.platforms.get(i);
-				graph.fillRect((int)pf.x, (int)pf.y, pf.width, pf.height);
-				//graph.fillOval((int)pf.x, (int)pf.y, pf.width, pf.height);
+				Platform p = Game.currentMap.platforms.get(i);
+				
+				BufferedImage unit = texture1;
+				
+				//Depending on type of platform, change unit texture
+				switch(p.type)
+				{
+					case 1:
+						unit = texture1;
+						break;
+					
+					case 2:
+						unit = texture2;
+						break;
+						
+					case 3: 
+						unit = texture3;
+						break;
+						
+					default:
+						unit = texture4;
+						break;
+				}
+				
+				for(int j = 0; j < p.pUnits.size(); j++)
+				{
+					Unit u = p.pUnits.get(j);
+					graph.drawImage(unit,(int)u.x, (int)u.y, Unit.UNIT_LENGTH, Unit.UNIT_LENGTH, null);
+					//graph.fillRect((int)u.x, (int)u.y, Unit.UNIT_LENGTH, Unit.UNIT_LENGTH);
+					//graph.fillOval((int)pf.x, (int)pf.y, pf.width, pf.height);
+				}
 			}
 			
 			//Draw all the platforms
-			for(int i = 0; i < Game.entities.size(); i++)
+			for(int i = 0; i < Game.currentMap.entities.size(); i++)
 			{
-				Entity e = Game.entities.get(i);
+				Entity e = Game.currentMap.entities.get(i);
+				
+				BufferedImage entityImage = entity1;
+				
+				//Determine player image depending on how long player was
+				//moving for.
+				if(e.entityMovement != 0)
+				{
+					if(e.entityMovement < 4000)
+					{
+						entityImage = entity1;
+					}
+					else if(e.entityMovement < 8000)
+					{
+						entityImage = entity2;
+					}
+					else if(e.entityMovement < 12000)
+					{
+						entityImage = entity3;
+					}
+					else if(e.entityMovement < 16000)
+					{
+						entityImage = entity4;
+					}
+				}
+				else
+				{
+					entityImage = entity2;
+				}
 				
 				if(e.isMeleeing)
 				{
@@ -119,8 +237,18 @@ public class Display extends Canvas implements Runnable
 							(int)e.y - (int)e.topOfEntity, e.girth);
 				}
 				else
-				{
-					graph.fillRect((int)e.x, (int)e.topOfEntity, e.girth, (int)e.y - (int)e.topOfEntity);
+				{	
+					//Draws player depending on direction the player is facing
+					if(e.direction == 1)
+					{
+						graph.drawImage(entityImage, (int)e.x, (int)e.topOfEntity, e.girth,
+								(int)e.y - (int)e.topOfEntity, null);
+					}
+					else
+					{
+						graph.drawImage(entityImage, (int)e.x + e.girth, (int)e.topOfEntity, -e.girth,
+								(int)e.y - (int)e.topOfEntity, null);
+					}
 				}
 			}
 			
@@ -148,59 +276,208 @@ public class Display extends Canvas implements Runnable
     * Load all graphics images in and scan for transparency pixels
     */
 	public void loadGraphics()
+	{	
+		//Try to load graphics file
+		try
+		{
+			playerStopped = ImageIO.read
+					(new File("resources/playerStopped.png"));
+			makeTransparent(playerStopped);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			player1 = ImageIO.read
+					(new File("resources/player1.png"));
+			makeTransparent(player1);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			player2 = ImageIO.read
+					(new File("resources/player2.png"));
+			makeTransparent(player2);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			player3 = ImageIO.read
+					(new File("resources/player3.png"));
+			makeTransparent(player3);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			player4 = ImageIO.read
+					(new File("resources/player4.png"));
+			makeTransparent(player4);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			playerDead = ImageIO.read
+					(new File("resources/playerDead.png"));
+			makeTransparent(playerDead);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			entity1 = ImageIO.read
+					(new File("resources/entity1.png"));
+			makeTransparent(entity1);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			entity2 = ImageIO.read
+					(new File("resources/entity2.png"));
+			makeTransparent(entity2);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			entity3 = ImageIO.read
+					(new File("resources/entity3.png"));
+			makeTransparent(entity3);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			entity4 = ImageIO.read
+					(new File("resources/entity4.png"));
+			makeTransparent(entity4);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			background = ImageIO.read
+					(new File("resources/background.png"));
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			texture1 = ImageIO.read
+					(new File("resources/texture1.png"));
+			makeTransparent(texture1);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			texture2 = ImageIO.read
+					(new File("resources/texture2.png"));
+			makeTransparent(texture2);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			texture3 = ImageIO.read
+					(new File("resources/texture3.png"));
+			makeTransparent(texture3);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+		
+		//Try to load graphics file
+		try
+		{
+			texture4 = ImageIO.read
+					(new File("resources/texture4.png"));
+			makeTransparent(texture4);
+		}
+		catch(Exception e)
+		{
+			//Leave as default black box if no textures found
+		}
+	}
+	
+   /**
+    * Makes a given image sent in transparent
+    * @param image
+    */
+	public void makeTransparent(BufferedImage image)
 	{
-		//Try to load graphics file
-		try
-		{
-			playerLeft = ImageIO.read
-					(new File("resources/playerLeft.png"));
-		}
-		catch(Exception e)
-		{
-			System.out.println("Image can't be found");
-			//Leave as default black box if no textures found
-		}
-		
 		//Effectively makes all white pixels in image transparent
-		/*for (int x = 0; x < playerLeft.getWidth(); ++x)
+		for (int x = 0; x < image.getWidth(); ++x)
 		{
-			for (int y = 0; y < playerLeft.getHeight(); ++y)
+			for (int y = 0; y < image.getHeight(); ++y)
 			{
 				//Masks RGB value at a given x, y pixel in the image, and if
 				//it is white (0xFFFFFF) then set that pixel to being transparent
 				//(aka. a value of 0)
-				if ((playerLeft.getRGB(x, y) & 0x00FFFFFF) == 0xFFFFFF) 
+				if ((image.getRGB(x, y) & 0x00FFFFFF) == 0x00FFFFFF) 
 				{
-				    playerLeft.setRGB(x, y, 0);
+					//System.out.println(image.getRGB(x, y));
+				    image.setRGB(x, y, 0);
 				}
 			}
-		}*/
-		
-		//Try to load graphics file
-		try
-		{
-			playerRight = ImageIO.read
-					(new File("resources/playerRight.png"));
 		}
-		catch(Exception e)
-		{
-			//Leave as default black box if no textures found
-		}
-		
-		//Effectively makes all white pixels in image transparent
-		/*for (int x = 0; x < playerRight.getWidth(); ++x)
-		{
-			for (int y = 0; y < playerRight.getHeight(); ++y)
-			{
-				//Masks RGB value at a given x, y pixel in the image, and if
-				//it is white (0xFFFFFF) then set that pixel to being transparent
-				//(aka. a value of 0)
-				if ((playerRight.getRGB(x, y) & 0x00FFFFFF) == 0xFFFFFF) 
-				{
-				    playerRight.setRGB(x, y, 0);
-				}
-			}
-		}*/
 	}
 	
 	@Override
@@ -217,6 +494,7 @@ public class Display extends Canvas implements Runnable
     */
 	public void start()
 	{
+		sc = new SoundController();
 		mainThread = new Thread(this);
 		mainThread.start();
 	}
@@ -230,6 +508,7 @@ public class Display extends Canvas implements Runnable
 		//While game is running tick events
 		while(isRunning)
 		{
+			SoundController.music.playAudioFile(0);
 			this.requestFocus();
 			isRunning = game.tick(input.key);
 			
@@ -245,6 +524,7 @@ public class Display extends Canvas implements Runnable
     */
 	public void exit()
 	{
+		sc.resetSounds();
 		System.exit(0);
 		
 		try
@@ -254,6 +534,7 @@ public class Display extends Canvas implements Runnable
 		catch(Exception e)
 		{
 			System.out.println("Unable to end thread");
+			System.exit(0);
 		}
 	}
 

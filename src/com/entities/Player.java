@@ -1,6 +1,7 @@
 package com.entities;
 
 import com.base.Game;
+import com.base.SoundController;
 import com.entities.Entity;
 import com.base.RunGame;
 import com.structures.Platform;
@@ -206,11 +207,17 @@ public class Player
 		
 		//If jumping
 		if(jumping && !entityOnTop)
-		{		
+		{	
 			//Move player up but decrease speed each time by gravity
 			//But the player has to be able to move upward
 			if(checkCollision(0, -upSpeed, null))
 			{	
+				//If just started the jump, and can jump
+				if(y == floor)
+				{
+					SoundController.jump.playAudioFile(0);
+				}
+				
 				y -= upSpeed;
 				upSpeed -= Game.GRAVITY;
 			}
@@ -383,7 +390,7 @@ public class Player
 	   /*
 	    * Make sure player cannot go through an entity in the game either
 	    */
-		for(Entity e: Game.entities)
+		for(Entity e: Game.currentMap.entities)
 		{
 			//Check collision of player and the entity
 			if(((newX <= e.x + e.girth && newX + girth > e.x + 1)) 
@@ -463,7 +470,7 @@ public class Player
 		}
 
 		//Check all platforms to see if the player is inside of them
-		for(Platform pf: Game.platforms)
+		for(Platform pf: Game.currentMap.platforms)
 		{
 			if(((newX <= pf.x + pf.width && newX + girth > pf.x + 1)) 
 					&& ((newY > pf.y && newY - height <= pf.y + pf.height)))
@@ -534,9 +541,11 @@ public class Player
 					newY = y + ya;
 					
 					//If player is crushed (below crouch height) and not in godMode
+					//and player is still alive
 					if(height < (int)((5 * DEFAULT_HEIGHT) / 8) + 0.5
-							&& !Player.godMode)
+							&& !Player.godMode && Player.isAlive)
 					{
+						SoundController.crushed.playAudioFile(0);
 						health = 0;
 						isAlive = false;
 					}
@@ -640,7 +649,7 @@ public class Player
 	   /*
 	    * Make sure player cannot go through an entity in the game either
 	    */
-		for(Entity e: Game.entities)
+		for(Entity e: Game.currentMap.entities)
 		{
 			if(((newX <= e.x + e.girth && newX + girth > e.x + 1)) 
 					&& ((newY > e.y - e.height && newY - height <= e.y))
@@ -651,7 +660,7 @@ public class Player
 		}
 
 		//Check all platforms to see if the player is inside of them
-		for(Platform pf: Game.platforms)
+		for(Platform pf: Game.currentMap.platforms)
 		{
 			if(((newX <= pf.x + pf.width && newX + girth > pf.x + 1)) 
 					&& ((newY > pf.y && newY - height <= pf.y + pf.height)))
@@ -679,7 +688,12 @@ public class Player
 			
 			if(health <= 0)
 			{
+				SoundController.death.playAudioFile(0);
 				isAlive = false;
+			}
+			else
+			{
+				SoundController.defaultHurt.playAudioFile(0);
 			}
 		}
 	}

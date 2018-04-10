@@ -2,6 +2,7 @@ package com.entities;
 
 import com.base.Game;
 import com.base.RunGame;
+import com.base.SoundController;
 import com.structures.Platform;
 
 /**
@@ -137,7 +138,7 @@ public class Projectile
 	    * and then hit the enemy if within range. Also cannot hit the
 	    * source enemy of the shot
 	    */
-		for(Entity e: Game.entities)
+		for(Entity e: Game.currentMap.entities)
 		{
 			if(((newX <= e.x + e.girth && newX + width > e.x + 1)) 
 					&& ((newY > e.y - e.height && newY - height <= e.y))
@@ -149,11 +150,12 @@ public class Projectile
 		}
 		
 		//Check all platforms to see if the player is inside of them
-		for(Platform pf: Game.platforms)
+		for(Platform pf: Game.currentMap.platforms)
 		{
 			if(((newX <= pf.x + pf.width && newX + width > pf.x + 1)) 
 					&& ((newY > pf.y && newY - height <= pf.y + pf.height)))
 			{		
+				SoundController.wallHit.playAudioFile(0);
 				return false;
 			}
 		}

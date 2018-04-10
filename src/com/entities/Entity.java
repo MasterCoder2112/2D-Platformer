@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.base.Game;
 import com.base.RunGame;
+import com.base.SoundController;
 import com.structures.Platform;
 
 /**
@@ -25,6 +26,7 @@ public class Entity
 	public int armor;
 	public int ID;
 	public int shield;
+	public int entityMovement;
 	public double x;
 	public double y;
 	public double topOfEntity;
@@ -265,6 +267,7 @@ public class Entity
 			//in the air and player is not standing on top of the entity
 			if(Player.y < topOfEntity && y == floor && !targetOnTop)
 			{
+				SoundController.jump.playAudioFile(0);
 				jumping = true;
 				upSpeed = 0.04;
 			}
@@ -310,6 +313,8 @@ public class Entity
 						}
 					}
 					
+					SoundController.laser.playAudioFile(0);
+					
 				   /*
 				    * If target can shoot in multiple directions, keep the upAngle
 				    * the same, but if not, set it to be completely horizontal, 
@@ -333,9 +338,11 @@ public class Entity
 					//If can do melee damage
 					if(canMelee && distanceFromTarget <= 20)
 					{
+						SoundController.meleeSwing.playAudioFile(0);
 						isMeleeing = true;
 						//Do melee damage
 						Player.hurt(damage);
+						SoundController.meleeHit.playAudioFile(0);
 					}
 				}
 			}
@@ -421,7 +428,7 @@ public class Entity
 			{
 				xa /= 3;
 				
-				//If player can move in this direction
+				//If entity can move in this direction
 				if(checkCollision(xa, 0, null))
 				{		
 					x += xa;
@@ -439,7 +446,7 @@ public class Entity
 			}
 			
 			//If can move in this direction
-			if(checkCollision(0, extraMovementY, null))
+			if(checkCollision(0, extraMovementY, null) && !jumping)
 			{		
 				y += extraMovementY;
 			}
@@ -447,9 +454,21 @@ public class Entity
 			//TODO fix horizontal crap with jumping
 			
 			//If can move in this direction
-			if(checkCollision(horizontalMovement, 0, null))
+			if(horizontalMovement != 0 && checkCollision(horizontalMovement, 0, null))
 			{		
 				x += horizontalMovement;
+				entityMovement++;
+				
+				//Reset movement texture every 16000 ticks
+				if(entityMovement >= 16000)
+				{
+					entityMovement = 1;
+				}
+			}
+			else
+			{
+				//If not moving, reset entity movement
+				entityMovement = 0;
 			}
 			
 			//If player reaches left edge of screen, loop him/her around
@@ -588,6 +607,7 @@ public class Entity
 		{
 			jumping = false;
 			fallingSpeed = 0;
+			upSpeed = 0;
 			inAir = false;
 			y = floor;
 			extraMovementY = 0;
@@ -645,7 +665,7 @@ public class Entity
 	   /*
 	    * Make sure player cannot go through an entity in the game either
 	    */
-		for(Entity e: Game.entities)
+		for(Entity e: Game.currentMap.entities)
 		{
 			if(((newX <= e.x + e.girth && newX + girth > e.x + 1)) 
 					&& ((newY > e.y - e.height && newY - height <= e.y)))
@@ -697,7 +717,7 @@ public class Entity
 		}
 
 		//Check all platforms to see if the player is inside of them
-		for(Platform pf: Game.platforms)
+		for(Platform pf: Game.currentMap.platforms)
 		{
 			if(((newX <= pf.x + pf.width && newX + girth > pf.x + 1)) 
 					&& ((newY > pf.y && newY - height <= pf.y + pf.height)))
@@ -745,7 +765,9 @@ public class Entity
 				}
 				
 				//If block is crushing player vertically
-				if(!checkCollision(0, pf.ySpeed, pf))
+				if(!checkCollision(0, pf.ySpeed, pf)
+						//&& !checkCollision(0, -pf.ySpeed, pf)
+						&& pf.ySpeed != 0.0)
 				{
 					isStuck = true;
 					
@@ -770,8 +792,8 @@ public class Entity
 					//If entity is crushed (below crouch height)
 					if(height < (int)((5 * startHeight) / 8) + 0.5)
 					{
-						health = 0;
-						isAlive = false;
+						SoundController.crushed.playAudioFile(0);
+						death();
 					}
 				}
 				
@@ -784,15 +806,11 @@ public class Entity
 			    * the entity.
 			    */
 				if(!checkCollision(pf.xSpeed, 0, pf)
-						&& !checkCollision(-pf.xSpeed, 0, null)
-						&& pf.xSpeed != 0.0)
+						&& !checkCollision(-pf.xSpeed, 0, pf)
+						&& pf.xSpeed != 0.0 && isAlive)
 				{
-					isStuck = true;
-					
-					//Player can crouch to avoid being crushed vertically,
-					//but there ain't nothing you can do horizontally
-					health = 0;
-					isAlive = false;
+					SoundController.crushed.playAudioFile(0);
+					death();
 				}
 				
 				canMove = false;
@@ -907,7 +925,7 @@ public class Entity
 	   /*
 	    * Make sure player cannot go through an entity in the game either
 	    */
-		for(Entity e: Game.entities)
+		for(Entity e: Game.currentMap.entities)
 		{
 			if(!e.equals(this) && ((newX <= e.x + e.girth && newX + girth > e.x + 1)) 
 					&& ((newY > e.y - e.height && newY - height <= e.y)))
@@ -917,7 +935,7 @@ public class Entity
 		}
 
 		//Check all platforms to see if the player is inside of them
-		for(Platform pf: Game.platforms)
+		for(Platform pf: Game.currentMap.platforms)
 		{
 			if(((newX <= pf.x + pf.width && newX + girth > pf.x + 1)) 
 					&& ((newY > pf.y && newY - height <= pf.y + pf.height)))
@@ -953,9 +971,22 @@ public class Entity
 		//Remove the entity if dead
 		if(health <= 0)
 		{
-			isAlive = false;
-			Game.entities.remove(this);
+			death();
 		}
+		else
+		{
+			SoundController.defaultHurt.playAudioFile(0);
+		}
+	}
+	
+   /**
+    * Called if the entity dies
+    */
+	public void death()
+	{
+		SoundController.death.playAudioFile(0);
+		isAlive = false;
+		Game.currentMap.entities.remove(this);
 	}
 	
    /**
@@ -1152,7 +1183,7 @@ public class Entity
 		{
 			//Check all platforms to see if the eyesight hits one of them
 			//meaning it reaches the inside of the platforms border
-			for(Platform pf: Game.platforms)
+			for(Platform pf: Game.currentMap.platforms)
 			{
 				if(((eyeX <= pf.x + pf.width && eyeX > pf.x + 1))
 						&& ((eyeY >= pf.y && eyeY <= pf.y + pf.height)))

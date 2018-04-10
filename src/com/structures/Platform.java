@@ -1,5 +1,7 @@
 package com.structures;
 
+import java.util.ArrayList;
+
 import com.base.Game;
 
 /**
@@ -23,6 +25,7 @@ public class Platform
 	public double ySpeed;
 	public int xMoveDist;
 	public int yMoveDist;
+	public int type;
 	
 	//Position variables
 	public double x;
@@ -41,9 +44,12 @@ public class Platform
 	public int slickness; //Could be used for ice or other type platforms
 	public int stickiness; //Block could slow you down or make it harder for certain movements
 	
+	//Holds all the units this platform contains
+	public ArrayList<Unit> pUnits = new ArrayList<Unit>();
+	
 	//Initialize a platform given all the variables
 	public Platform(int x, int y, int width, int height, int xMoveDist, int yMoveDist, double xSpeed, double ySpeed,
-			boolean isSolid, boolean isLiquid) 
+			boolean isSolid, boolean isLiquid, int type) 
 	{
 		this.x = x;
 		this.y = y;
@@ -59,12 +65,15 @@ public class Platform
 		this.isLiquid = isLiquid;
 		this.xMoveDist = xMoveDist;
 		this.yMoveDist = yMoveDist;
+		this.type = type;
 		
 		//If the platform is supposed to move
 		if(startX != endX || startY != endY)
 		{
 			isMoving = true;
 		}
+		
+		breakIntoUnits();
 	}
 	
 	//Minimal variables needed for a non-moving default platform
@@ -85,7 +94,7 @@ public class Platform
 		this.ySpeed = 0;
 		
 		//Add to the game
-		Game.platforms.add(this);
+		Game.currentMap.platforms.add(this);
 	}
 	
    /**
@@ -151,6 +160,27 @@ public class Platform
 					y = startY;
 					ySpeed = -ySpeed;
 				}
+			}
+		}
+	}
+	
+   /**
+    * Takes platform sent in (only used if platforms are hardcoded)
+    * and breaks it into units that are then added into the map
+    */
+	public void breakIntoUnits()
+	{	
+		//Runs through the platform and breaks it into its unit parts and
+		//adds them into the game. Type is one for now
+		for(int r = startY; r < startY + height; r += 15)
+		{
+			for(int c = startX; c < startX + width; c += 15)
+			{
+				Unit u = new Unit(1, c, r, xSpeed, ySpeed, (endX - startX) + c, (endY - startY) + r);
+				
+				pUnits.add(u);
+				//Game.currentMap.map[r / 15][c / 15] = u;
+				Game.currentMap.solidUnits.add(u);
 			}
 		}
 	}
