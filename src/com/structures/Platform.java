@@ -176,12 +176,15 @@ public class Platform
 		{
 			for(int c = startX; c < startX + width; c += 15)
 			{
-				Unit u = new Unit(1, c, r, xSpeed, ySpeed, (endX - startX) + c, (endY - startY) + r);
+				//System.out.println(type);
+				Unit u = new Unit(type, c, r, xSpeed, ySpeed, (endX - startX) + c, (endY - startY) + r);
 				
 				pUnits.add(u);
-				//Game.currentMap.map[r / 15][c / 15] = u;
+				Game.currentMap.map[r / 15][c / 15] = u;
 				Game.currentMap.solidUnits.add(u);
 			}
 		}
+		
+		Game.currentMap.createBlocks();
 	}
 }

@@ -35,7 +35,9 @@ public class Unit
 	
 	public boolean canDestroy = false; //Can't destroy by default
  	public boolean isSolid = false; //Air or not?
-	
+ 
+	public Block parentBlock = null; //Block the unit is currently in
+ 	
 	public Unit(int type, int x, int y, double xSpeed, double ySpeed,
 			int xDist, int yDist) 
 	{

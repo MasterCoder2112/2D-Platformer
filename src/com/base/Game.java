@@ -7,6 +7,7 @@ import java.util.Random;
 import com.entities.Entity;
 import com.entities.Player;
 import com.entities.Projectile;
+import com.structures.Block;
 import com.structures.Map;
 import com.structures.Platform;
 import com.structures.Unit;
@@ -117,6 +118,12 @@ public class Game
 		for(Unit u: currentMap.solidUnits)
 		{
 			u.updateUnit();
+		}
+		
+		//Update all the blocks
+		for(Block b: currentMap.blocks)
+		{
+			b.setUpBlock();
 		}
 		
 		//Update all the entities
@@ -408,10 +415,10 @@ public class Game
 		unmodifiedMap = new Map();
 		currentMap = new Map();
 		
-		Platform p1 = new Platform(105, 300, 195, 15, 0, 250, 0, 0.01, true, false, 1);
-		Platform p2 = new Platform(405, 300, 30, 105, 0, 0, 0, 0, true, false, 2);
+		Platform p1 = new Platform(105, 330, 180, 15, 0, 250, 0, -0.01, true, false, 4);
+		Platform p2 = new Platform(405, 300, 15, 105, 0, 0, 0, 0, true, false, 2);
 		Platform p3 = new Platform(300, 405, 300, 30, 100, 0, 0.01, 0, true, false, 3);
-		Platform p4 = new Platform(105, 300, 105, 30, 0, 350, 0, 0, true, false, 4);
+		Platform p4 = new Platform(105, 300, 105, 30, 0, 350, 0, 0, true, false, 1);
 		Platform p5 = new Platform(300, 300, 30, 105, 100, 0, 0.01, 0, true, false, 2);
 		
 		//Copies of those platforms

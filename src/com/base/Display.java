@@ -14,6 +14,7 @@ import com.entities.Entity;
 import com.entities.Player;
 import com.entities.Projectile;
 import com.input.InputHandler;
+import com.structures.Block;
 import com.structures.Platform;
 import com.structures.Unit;
 
@@ -163,6 +164,7 @@ public class Display extends Canvas implements Runnable
 				((int)player.y - (int)player.topOfPlayer));
 			
 			//Draw all the platforms
+			/*
 			for(int i = 0; i < Game.currentMap.platforms.size(); i++)
 			{
 				Platform p = Game.currentMap.platforms.get(i);
@@ -196,6 +198,38 @@ public class Display extends Canvas implements Runnable
 					//graph.fillRect((int)u.x, (int)u.y, Unit.UNIT_LENGTH, Unit.UNIT_LENGTH);
 					//graph.fillOval((int)pf.x, (int)pf.y, pf.width, pf.height);
 				}
+			}*/
+			
+			//Draw all blocks (TESTING RIGHT NOW)
+			for(int i = 0; i < Game.currentMap.blocks.size(); i++)
+			{
+				Block b = Game.currentMap.blocks.get(i);
+				
+				BufferedImage block = texture1;
+				
+				//Depending on type of platform, change unit texture
+				switch(b.type)
+				{
+					case 1:
+						block = texture1;
+						break;
+					
+					case 2:
+						block = texture2;
+						break;
+						
+					case 3: 
+						block = texture3;
+						break;
+						
+					default:
+						block = texture4;
+						break;
+				}
+
+				graph.drawImage(block,(int)b.x, (int)b.y, b.width * Unit.UNIT_LENGTH, b.width * Unit.UNIT_LENGTH, null);
+				//graph.fillRect((int)u.x, (int)u.y, Unit.UNIT_LENGTH, Unit.UNIT_LENGTH);
+				//graph.fillOval((int)pf.x, (int)pf.y, pf.width, pf.height);
 			}
 			
 			//Draw all the platforms
