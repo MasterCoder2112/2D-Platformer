@@ -31,7 +31,7 @@ public class Map
 	public Map() 
 	{
 		//Default map is just the size of the single screen
-		map = new Unit[RunGame.HEIGHT / 15][RunGame.WIDTH / 15];
+		map = new Unit[(RunGame.HEIGHT / 15) * 4][(RunGame.WIDTH / 15) * 4];
 		
 		//Set up the map defaultely with air units
 		for(int r = 0; r < map.length; r++)
@@ -215,15 +215,11 @@ public class Map
 						//the bUnits array list and searched double array.
 						if(!searched[uy + l][ux + k])
 						{
-							Unit temp = solidUnits.get(solidUnits.indexOf(map[uy + l][ux + k]));
-							Unit temp2 = map[uy + l][ux + k];
+							Unit temp = map[uy + l][ux + k];
 							
 							temp.parentBlock = b;
 							searched[uy + l][ux + k] = true;
 							b.bUnits.add(temp);
-							
-							temp2.parentBlock = b;
-							b.bUnits.add(temp2);
 						}
 					}
 				}

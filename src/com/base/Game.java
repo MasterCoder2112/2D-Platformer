@@ -353,33 +353,46 @@ public class Game
 			}
 			
 			//Randomize Whether platform starts in negative or positive x
+			//Also get rid of any remainder if not unit of 15
 			if(rX == 0)
 			{
 				rX = rand.nextInt(RunGame.WIDTH);
+				
+				rX -= rX % 15;
 			}
 			else
 			{
 				rX = -rand.nextInt(RunGame.WIDTH);
+				
+				rX -= rX % 15;
 			}
 			
+			//Same thing but for yPos.
 			if(rY == 0)
 			{
 				rY = rand.nextInt(RunGame.WIDTH);
+				
+				rY -= rY % 15;
 			}
 			else
 			{
 				rY = -rand.nextInt(RunGame.WIDTH);
+				
+				rY -= rY % 15;
 			}
 			
+			int w = rand.nextInt(RunGame.WIDTH);
+			int h = rand.nextInt(RunGame.HEIGHT - 30);
+			
 			Platform temp = new Platform(rX, rY,
-					rand.nextInt(RunGame.WIDTH) - (rand.nextInt(RunGame.WIDTH) % 15),
-					rand.nextInt(RunGame.HEIGHT - 30) - (rand.nextInt(RunGame.HEIGHT - 30) % 15),
+					w - (w % 15),
+					h - (h % 15),
 					xEnd, yEnd,
 					rand.nextInt(10) / 100.0, rand.nextInt(10) / 100.0, true, false, rand.nextInt(4) + 1);
 			
 			Platform temp2 = new Platform(rX, rY,
-					rand.nextInt(RunGame.WIDTH) - (rand.nextInt(RunGame.WIDTH) % 15),
-					rand.nextInt(RunGame.HEIGHT - 30) - (rand.nextInt(RunGame.HEIGHT - 30) % 15),
+					w - (w % 15),
+					h - (h % 15),
 					xEnd, yEnd,
 					rand.nextInt(10) / 100.0, rand.nextInt(10) / 100.0, true, false, rand.nextInt(4) + 1);
 			
@@ -416,7 +429,7 @@ public class Game
 		currentMap = new Map();
 		
 		Platform p1 = new Platform(105, 330, 180, 15, 0, 250, 0, -0.01, true, false, 4);
-		Platform p2 = new Platform(405, 300, 15, 105, 0, 0, 0, 0, true, false, 2);
+		Platform p2 = new Platform(405, 225, 120, 120, 0, 0, 0, 0, true, false, 2);
 		Platform p3 = new Platform(300, 405, 300, 30, 100, 0, 0.01, 0, true, false, 3);
 		Platform p4 = new Platform(105, 300, 105, 30, 0, 350, 0, 0, true, false, 1);
 		Platform p5 = new Platform(300, 300, 30, 105, 100, 0, 0.01, 0, true, false, 2);
