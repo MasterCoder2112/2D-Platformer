@@ -17,6 +17,7 @@ import com.input.InputHandler;
 import com.structures.Block;
 import com.structures.Platform;
 import com.structures.Unit;
+import com.input.InputHandler;
 
 /**
  * @title Display
@@ -67,6 +68,8 @@ public class Display extends Canvas implements Runnable
 		//Handles key events 
 		input = new InputHandler();
 		addKeyListener(input);
+		addMouseListener(input);
+		addMouseMotionListener(input);
 		player = new Player();
 		
 		//Starts new Game object for handling events
@@ -94,6 +97,7 @@ public class Display extends Canvas implements Runnable
 			//Draws Background
 			graph.drawImage(background, 0, 0, RunGame.WIDTH,
 					RunGame.HEIGHT, null);
+			
 			
 			//If player is dead
 			if(!Player.isAlive)
@@ -293,6 +297,10 @@ public class Display extends Canvas implements Runnable
 				//graph.fillRect((int)p.x, (int)p.y, p.width, p.height);
 				graph.fillOval((int)p.x, (int)p.y, p.width, p.height);
 			}
+			
+			//Draws makeshift crosshair just so I can see where the cursor is, it's pretty off center
+			graph.fillRect((int)InputHandler.mouseX, (int)InputHandler.mouseY, 9, 3);
+			graph.fillRect((int)InputHandler.mouseX + 3, (int)InputHandler.mouseY - 3, 3, 9);
 		
 		    // At the end of the method, draw the backBuffer to the 
 		    // screen.

@@ -1,8 +1,10 @@
 package com.entities;
 
+import com.base.Display;
 import com.base.Game;
 import com.base.RunGame;
 import com.base.SoundController;
+import com.input.InputHandler;
 import com.structures.Platform;
 
 /**
@@ -51,6 +53,19 @@ public class Projectile
 		//Set the x movement variable for the projectile
 		this.xa = direction * (Math.tan(upAngle) * this.ya);
 		
+		int xDir = 1;
+		int yDir = 1;
+		
+		if(this.xa < 0)
+		{
+			xDir = -1;
+		}
+		
+		if(this.ya < 0)
+		{
+			yDir = -1;
+		}
+		
 	   /*
 	    * Fixes speed issues when Math.tan(upAngle) is less than 1 making
 	    * ya greater than the speed that the projectile should be.
@@ -63,8 +78,15 @@ public class Projectile
 			//the same.
 			double temp = this.ya / speed;
 			this.xa /= temp;
+			
+			//If x was changed to the wrong direction
+			if((xDir > 0 && this.xa <= 0)
+					|| (xDir < 0 && this.xa >= 0))
+			{
+				this.xa *= -1;
+			}
 
-			this.ya = speed;
+			this.ya = speed * yDir;
 		}
 
 		//If player is directly above, then shoot straight up at a
@@ -81,7 +103,9 @@ public class Projectile
 	    * weird otherwise and go the opposite direction that it
 	    * should... Only do if entity shoots this projectile.
 	    */
-		if((targetY < this.y) && src != null)
+		if(((targetY < this.y) && src != null)
+				|| (this.ya > 0 && InputHandler.mouseY <= Display.player.y && upAngle == 0)
+				|| (this.ya < 0 && InputHandler.mouseY > Display.player.y && upAngle == 0))
 		{
 			ya = -ya;
 		}
