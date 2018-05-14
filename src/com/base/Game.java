@@ -7,6 +7,7 @@ import java.util.Random;
 import com.entities.Entity;
 import com.entities.Player;
 import com.entities.Projectile;
+import com.launcher.RunLauncher;
 import com.structures.Block;
 import com.structures.Map;
 import com.structures.Platform;
@@ -57,6 +58,7 @@ public class Game
 		if(key[KeyEvent.VK_ESCAPE])
 		{
 			RunGame.frame.dispose();
+			new RunLauncher();
 			return false;
 		}
 		
