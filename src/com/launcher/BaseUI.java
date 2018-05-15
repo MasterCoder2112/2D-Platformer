@@ -56,12 +56,12 @@ public abstract class BaseUI extends JFrame //, basicUI
 	protected void ActionPerformed(Object o)
 	{
 		//Eclipse warns it's unhandled - ignore it, it'll still compile; it's intentional.
-		throw new Exception("ActionPerformed method must be overridden by child classes.");
+		//throw new Exception("ActionPerformed method must be overridden by child classes.");
 	}
 	
 	public BaseUI()
 	{
-		setTitle("Excelsior Launcher ("+RunGame.dev+" "+RunGame.versionNum+")");
+		//setTitle("Excelsior Launcher ("+RunGame.dev+" "+RunGame.versionNum+")");
 		setSize(new Dimension(WIDTH, HEIGHT));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setContentPane(panel);
