@@ -10,8 +10,6 @@ import javax.swing.JTextField;
 import com.base.RunGame;
 
 
-//CLASS DEV STATUS: Copying loads of stuff from 3D Game's FPSLauncher.java
-
 
 /**
  * @title  FPSLauncher

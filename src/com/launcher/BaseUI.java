@@ -68,7 +68,7 @@ public abstract class BaseUI extends JFrame //, basicUI
 	
 	public BaseUI()
 	{
-		setTitle("Excelsior Launcher ("+RunGame.dev+" "+RunGame.versionNum+")");
+		//setTitle("Excelsior Launcher ("+RunGame.dev+" "+RunGame.versionNum+")");
 		setSize(new Dimension(WIDTH, HEIGHT));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setContentPane(panel);

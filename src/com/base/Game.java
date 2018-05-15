@@ -1,12 +1,14 @@
 package com.base;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
 import com.entities.Entity;
 import com.entities.Player;
 import com.entities.Projectile;
+import com.input.InputHandler;
 import com.launcher.RunLauncher;
 import com.structures.Block;
 import com.structures.Map;
@@ -33,7 +35,6 @@ public class Game
 	public static Map unmodifiedMap = new Map();
 	public static Map currentMap = new Map();
 	public static int playerMovement = 0;
-	
 	public static int shootTimer = 0; //Allows for shooting not to be as fast
 	private int eventTimer = 0; //Allows events not to be activated as fast
 	
@@ -138,15 +139,22 @@ public class Game
 		ArrayList<Projectile> delete = new ArrayList<Projectile>();
 		
 		//Update all the projectiles
-		for(Projectile p: projectiles)
+		try
 		{
-			p.move();
-			
-			//If it is to be deleted
-			if(p.toBeDeleted)
+			for(Projectile p: projectiles)
 			{
-				delete.add(p);
+				p.move();
+				
+				//If it is to be deleted
+				if(p.toBeDeleted)
+				{
+					delete.add(p);
+				}
 			}
+		}
+		catch(Exception e)
+		{
+			
 		}
 		
 		//Remove those projectiles that are to be deleted from the game
@@ -203,7 +211,7 @@ public class Game
 			}
 			
 			//If shooting a projectile
-			if(key[KeyEvent.VK_V] && shootTimer == 0)
+			if((key[KeyEvent.VK_V]) && shootTimer == 0)
 			{
 				SoundController.laser.playAudioFile(0);
 				//Depending on direction, have projectile come out of left or
