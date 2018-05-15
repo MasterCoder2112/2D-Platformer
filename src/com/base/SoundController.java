@@ -95,7 +95,7 @@ public class SoundController
 		try
 		{
 			//Try to find sound in current resource pack
-			temp =  new Sound(size, "resources/audio/"+fileName+".wav", loop);
+			temp =  new Sound(size, "/audio/"+fileName+".wav", loop);
 			allSounds.add(temp);
 			temp.audioName = fileName;
 		}
@@ -104,7 +104,7 @@ public class SoundController
 			try
 			{
 				//If sound is not found in the resource pack
-				temp =  new Sound(size, "resources/audio/"+fileName+".wav", loop);
+				temp =  new Sound(size, "/audio/"+fileName+".wav", loop);
 				allSounds.add(temp);
 				temp.audioName = fileName;
 			}

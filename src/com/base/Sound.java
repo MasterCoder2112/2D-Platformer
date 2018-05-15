@@ -47,7 +47,7 @@ public class Sound
 		for(int i = 0; i < clipSize; i++)
 		{
 			input[i] = AudioSystem
-					.getAudioInputStream(new File(file));
+					.getAudioInputStream(this.getClass().getResource(file));
 			
 			soundClip[i] = AudioSystem.getClip();
 

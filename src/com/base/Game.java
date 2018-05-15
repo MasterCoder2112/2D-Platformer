@@ -25,15 +25,15 @@ import com.structures.Unit;
 public class Game
 {
 	public static int tickCount = 0;
-	public static final double GRAVITY = 0.000005;
 	
+	public static final double GRAVITY = 0.000005;
 	public static ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	
 	public static Map unmodifiedMap = new Map();
 	public static Map currentMap = new Map();
 	public static int playerMovement = 0;
 	
-	private int shootTimer = 0; //Allows for shooting not to be as fast
+	public static int shootTimer = 0; //Allows for shooting not to be as fast
 	private int eventTimer = 0; //Allows events not to be activated as fast
 	
 	//Set up initial variables

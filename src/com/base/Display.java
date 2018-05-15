@@ -315,7 +315,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			playerStopped = ImageIO.read
-					(new File("resources/playerStopped.png"));
+					(this.getClass().getResource("/playerStopped.png"));
 			makeTransparent(playerStopped);
 		}
 		catch(Exception e)
@@ -327,7 +327,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			player1 = ImageIO.read
-					(new File("resources/player1.png"));
+					(this.getClass().getResource("/player1.png"));
 			makeTransparent(player1);
 		}
 		catch(Exception e)
@@ -339,7 +339,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			player2 = ImageIO.read
-					(new File("resources/player2.png"));
+					(this.getClass().getResource("/player2.png"));
 			makeTransparent(player2);
 		}
 		catch(Exception e)
@@ -351,7 +351,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			player3 = ImageIO.read
-					(new File("resources/player3.png"));
+					(this.getClass().getResource("/player3.png"));
 			makeTransparent(player3);
 		}
 		catch(Exception e)
@@ -363,7 +363,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			player4 = ImageIO.read
-					(new File("resources/player4.png"));
+					(this.getClass().getResource("/player4.png"));
 			makeTransparent(player4);
 		}
 		catch(Exception e)
@@ -375,7 +375,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			playerDead = ImageIO.read
-					(new File("resources/playerDead.png"));
+					(this.getClass().getResource("/playerDead.png"));
 			makeTransparent(playerDead);
 		}
 		catch(Exception e)
@@ -387,7 +387,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			entity1 = ImageIO.read
-					(new File("resources/entity1.png"));
+					(this.getClass().getResource("/entity1.png"));
 			makeTransparent(entity1);
 		}
 		catch(Exception e)
@@ -399,7 +399,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			entity2 = ImageIO.read
-					(new File("resources/entity2.png"));
+					(this.getClass().getResource("/entity2.png"));
 			makeTransparent(entity2);
 		}
 		catch(Exception e)
@@ -411,7 +411,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			entity3 = ImageIO.read
-					(new File("resources/entity3.png"));
+					(this.getClass().getResource("/entity3.png"));
 			makeTransparent(entity3);
 		}
 		catch(Exception e)
@@ -423,7 +423,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			entity4 = ImageIO.read
-					(new File("resources/entity4.png"));
+					(this.getClass().getResource("/entity4.png"));
 			makeTransparent(entity4);
 		}
 		catch(Exception e)
@@ -435,7 +435,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			background = ImageIO.read
-					(new File("resources/background.png"));
+					(this.getClass().getResource("/background.png"));
 		}
 		catch(Exception e)
 		{
@@ -446,7 +446,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			texture1 = ImageIO.read
-					(new File("resources/texture1.png"));
+					(this.getClass().getResource("/texture1.png"));
 			makeTransparent(texture1);
 		}
 		catch(Exception e)
@@ -458,7 +458,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			texture2 = ImageIO.read
-					(new File("resources/texture2.png"));
+					(this.getClass().getResource("/texture2.png"));
 			makeTransparent(texture2);
 		}
 		catch(Exception e)
@@ -470,7 +470,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			texture3 = ImageIO.read
-					(new File("resources/texture3.png"));
+					(this.getClass().getResource("/texture3.png"));
 			makeTransparent(texture3);
 		}
 		catch(Exception e)
@@ -482,7 +482,7 @@ public class Display extends Canvas implements Runnable
 		try
 		{
 			texture4 = ImageIO.read
-					(new File("resources/texture4.png"));
+					(this.getClass().getResource("/texture4.png"));
 			makeTransparent(texture4);
 		}
 		catch(Exception e)

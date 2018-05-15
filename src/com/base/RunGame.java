@@ -56,7 +56,6 @@ public class RunGame
 			
 			//ImageIcon titleIcon = new ImageIcon("resources"+FPSLauncher.themeName+"/textures/hud/titleIcon.png");
 			//frame.setIconImage(titleIcon.getImage());
-			
 			frame.setVisible(true);
 			frame.setAlwaysOnTop(true);
 			frame.setFocusableWindowState(true);
