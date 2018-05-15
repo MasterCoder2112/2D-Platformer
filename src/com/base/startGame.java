@@ -1,5 +1,7 @@
 package com.base;
 
+import com.launcher.RunLauncher;
+
 /**
  * @title startGame
  * @author Alexander Byrd
@@ -13,6 +15,11 @@ public class startGame
 {
 	public static void main(String[] args) 
 	{
-		new RunGame();
+		//TODO: uncomment.
+		new RunLauncher();
+		
+		
+		//TODO: move into RunLauncher class.
+		//new RunGame();
 	}
 }
