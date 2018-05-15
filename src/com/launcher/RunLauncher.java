@@ -12,7 +12,7 @@ import com.base.RunGame;
 
 
 /**
- * @title  FPSLauncher
+ * @title  RunLauncher
  * @author Alex Byrd, Jonathan Gramm
  * @modified 5/12/18
  * Description:

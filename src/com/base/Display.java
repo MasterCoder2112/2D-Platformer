@@ -21,7 +21,7 @@ import com.input.InputHandler;
 
 /**
  * @title Display
- * @author Alexander Byrd
+ * @author Alexander Byrd, Tiffany Wortham, Jonathan Gramm
  * Date Created: February 12, 2018
  * 
  * Description:

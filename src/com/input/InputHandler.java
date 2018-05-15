@@ -13,6 +13,16 @@ import com.entities.Player;
 import com.entities.Projectile;
 import com.base.Game;
 
+/**
+ * @title  InputHandler
+ * @author Tiffany Wortham, Alex Byrd
+ * @modified 5/12/18
+ * Description:
+ * Adds mouse listeners so that the projectiles will shoot correctly
+ * from the player, and the players direction will change based on where the
+ * mouse is.
+ *
+ */
 public class InputHandler implements KeyListener, MouseListener, MouseMotionListener
 {
 	//All the possible combinations on the keyboard
@@ -56,9 +66,9 @@ public class InputHandler implements KeyListener, MouseListener, MouseMotionList
 	}
 	
 	public void mousePressed(MouseEvent e)
-	{
-		SoundController.laser.playAudioFile(0);
-		
+	{	
+		//Figures out upangle of the projectile based on difference on where the crosshair
+		//is versus the players position.
 		distanceX = mouseX - (Player.x + Player.girth);
         distanceY = (Player.y - (Player.height * 3/4) - mouseY);
         
@@ -70,18 +80,26 @@ public class InputHandler implements KeyListener, MouseListener, MouseMotionList
         }
         
 		
-		//Depending on direction, have projectile come out of left or
-		//right side of Display.player.
-		if(Display.player.direction == 1 && Game.shootTimer == 0)
-		{
-			new Projectile(Player.x + Player.girth, Player.y - (Player.height * 3 / 4),
-				0.02, 25, Display.player.direction, 0, null, -upAngle, 0);
-		}
-		else if(Game.shootTimer == 0)
-		{
-			new Projectile(Player.x, Player.y - (Player.height * 3 / 4),
-					0.02, 25, Display.player.direction, 0, null, upAngle, 0);
-		}
+	   /*
+	    * If the weapon is ready to fire, fire the projectile at an angle
+	    * and direction depending on where the cursor (crosshair) is and
+	    * the players direction.
+	    */
+        if(Game.shootTimer == 0)
+        {
+        	SoundController.laser.playAudioFile(0);
+        	
+			if(Display.player.direction == 1)
+			{
+				new Projectile(Player.x + Player.girth, Player.y - (Player.height * 3 / 4),
+					0.02, 25, Display.player.direction, 0, null, -upAngle, 0);
+			}
+			else
+			{
+				new Projectile(Player.x, Player.y - (Player.height * 3 / 4),
+						0.02, 25, Display.player.direction, 0, null, upAngle, 0);
+			}
+        }
 		
 		Game.shootTimer++;
 	}
@@ -120,6 +138,8 @@ public class InputHandler implements KeyListener, MouseListener, MouseMotionList
 
 	public void mouseMoved(MouseEvent e) {
 		// TODO Auto-generated method stub
+		
+		//Tracks the mouses position and changes players direction based on it
 		mouseX = e.getX();
         mouseY = e.getY();
         

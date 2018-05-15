@@ -16,9 +16,6 @@ import javax.swing.JTextArea;
 import com.base.RunGame;
 
 
-//CLASS DEV STATUS: Copying loads of stuff from 3D Game's FPSLauncher.java
-
-
 /**
  * @title  UI base, abstract
  * @author Alex Byrd, Jonathan Gramm
