@@ -9,7 +9,7 @@ import com.structures.Platform;
 
 /**
  * @title Entity
- * @author Alexander Byrd
+ * @author Alexander Byrd, Jonathan Gramm
  * Date Created: February 17, 2018
  * 
  * Description:
@@ -288,8 +288,6 @@ public class Entity
 					{
 						sourceX = x + girth;
 					}
-					
-					//TODO yeah
 
 					//If target is negligibly above the entity,
 					//then just shoot directly up.

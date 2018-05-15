@@ -55,8 +55,15 @@ public abstract class BaseUI extends JFrame //, basicUI
 
 	protected void ActionPerformed(Object o)
 	{
+		try
+		{
 		//Eclipse warns it's unhandled - ignore it, it'll still compile; it's intentional.
-		throw new Exception("ActionPerformed method must be overridden by child classes.");
+			throw new Exception("ActionPerformed method must be overridden by child classes.");
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
 	}
 	
 	public BaseUI()

@@ -8,7 +8,7 @@ import com.structures.Platform;
 
 /**
  * @title Player
- * @author Alexander Byrd
+ * @author Alexander Byrd, Tiffany Wortham
  * Date Created: February 12, 2018
  * 
  * Description:

@@ -34,6 +34,9 @@ public class RunLauncher extends BaseUI //, basicUI
 	protected int panelType;
 	
 	@Override
+   /**
+    * Depending on button pressed, a certain action is performed.
+    */
 	public void ActionPerformed(Object o)
 	{
 		if(o == playGame)
@@ -80,7 +83,9 @@ public class RunLauncher extends BaseUI //, basicUI
 		drawLauncherButtons();
 	}
 
-	
+   /**
+    * Draws buttons to main menu and adds them to their bounds
+    */
 	protected void drawLauncherButtons()
 	{
 		playGame = addButton("New Game", new Rectangle(300, 50, 200, 40));
@@ -90,8 +95,8 @@ public class RunLauncher extends BaseUI //, basicUI
 		controls.addActionListener(aL);
 		panel.add(controls); */
 		
-		readMe = addButton("Read Me", new Rectangle(300, 200, 200, 40));				
-		quit = addButton("Quit", new Rectangle(300, 250, 200, 40));
+		readMe = addButton("Read Me", new Rectangle(300, 100, 200, 40));				
+		quit = addButton("Quit", new Rectangle(300, 150, 200, 40));
 	}
 	
    /**

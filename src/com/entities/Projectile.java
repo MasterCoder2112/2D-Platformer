@@ -7,7 +7,7 @@ import com.structures.Platform;
 
 /**
  * @title Projectile
- * @author Alexander Byrd
+ * @author Alexander Byrd, Tiffany Wortham
  * Date Created: February 15, 2018
  * 
  * Description:

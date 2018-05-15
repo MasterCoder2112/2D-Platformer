@@ -46,7 +46,7 @@ public class ReadMe extends RunLauncher
 		try
 		{
 			Scanner sc = new Scanner(new BufferedReader
-					(new FileReader("game_readme.txt")));
+					(new FileReader("README.txt")));
 		
 			while(sc.hasNext())
 			{
@@ -60,6 +60,6 @@ public class ReadMe extends RunLauncher
 			
 		}
 	
-		readme = addTextArea(InsertLineBreaks(textString, 92, true), new Rectangle(WIDTH / 8, 50, WIDTH * 6 / 8, 80), true); //TODO: fix		
+		readme = addTextArea(textString, new Rectangle(WIDTH / 8, 50, WIDTH * 6 / 8, 80), true); //TODO: fix		
 	}
 }

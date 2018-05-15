@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 
 /**
  * Title: RunGame
- * @author Alex Byrd
+ * @author Alex Byrd, Jonathan Gramm
  * Date Created: 2/12/2018
  *
  * Sets up the frame of the game, the cursor, and instantiates the
@@ -20,8 +20,8 @@ public class RunGame
 {
 	public static JFrame frame;
 	public static Display display;
-	private String dev = "Infdev";
-	private double versionNum = 0.35;
+	public static String dev = "Infdev";
+	public static double versionNum = 0.5;
 	public static final int WIDTH = 810;
 	public static final int HEIGHT = 600;
 	
